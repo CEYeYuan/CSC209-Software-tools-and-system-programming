@@ -1,0 +1,202 @@
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0  24336  2240 ?        Ss   Jan19   0:02 /sbin/init
+root         2  0.0  0.0      0     0 ?        S    Jan19   0:00 [kthreadd]
+root         3  0.0  0.0      0     0 ?        S    Jan19   0:00 [ksoftirqd/0]
+root         5  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kworker/0:0H]
+root         7  0.0  0.0      0     0 ?        S    Jan19   0:37 [rcu_sched]
+root         8  0.0  0.0      0     0 ?        S    Jan19   0:38 [rcuos/0]
+root         9  0.0  0.0      0     0 ?        S    Jan19   0:11 [rcuos/1]
+root        10  0.0  0.0      0     0 ?        S    Jan19   0:13 [rcuos/2]
+root        11  0.0  0.0      0     0 ?        S    Jan19   0:12 [rcuos/3]
+root        12  0.0  0.0      0     0 ?        S    Jan19   0:00 [rcu_bh]
+root        13  0.0  0.0      0     0 ?        S    Jan19   0:00 [rcuob/0]
+root        14  0.0  0.0      0     0 ?        S    Jan19   0:00 [rcuob/1]
+root        15  0.0  0.0      0     0 ?        S    Jan19   0:00 [rcuob/2]
+root        16  0.0  0.0      0     0 ?        S    Jan19   0:00 [rcuob/3]
+root        17  0.0  0.0      0     0 ?        S    Jan19   0:00 [migration/0]
+root        18  0.0  0.0      0     0 ?        S    Jan19   0:01 [watchdog/0]
+root        19  0.0  0.0      0     0 ?        S    Jan19   0:01 [watchdog/1]
+root        20  0.0  0.0      0     0 ?        S    Jan19   0:00 [migration/1]
+root        21  0.0  0.0      0     0 ?        S    Jan19   0:00 [ksoftirqd/1]
+root        23  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kworker/1:0H]
+root        24  0.0  0.0      0     0 ?        S    Jan19   0:01 [watchdog/2]
+root        25  0.0  0.0      0     0 ?        S    Jan19   0:00 [migration/2]
+root        26  0.0  0.0      0     0 ?        S    Jan19   0:00 [ksoftirqd/2]
+root        27  0.0  0.0      0     0 ?        S    Jan19   0:00 [kworker/2:0]
+root        28  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kworker/2:0H]
+root        29  0.0  0.0      0     0 ?        S    Jan19   0:01 [watchdog/3]
+root        30  0.0  0.0      0     0 ?        S    Jan19   0:00 [migration/3]
+root        31  0.0  0.0      0     0 ?        S    Jan19   0:00 [ksoftirqd/3]
+root        33  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kworker/3:0H]
+root        34  0.0  0.0      0     0 ?        S<   Jan19   0:00 [khelper]
+root        35  0.0  0.0      0     0 ?        S    Jan19   0:00 [kdevtmpfs]
+root        36  0.0  0.0      0     0 ?        S<   Jan19   0:00 [netns]
+root        37  0.0  0.0      0     0 ?        S<   Jan19   0:00 [writeback]
+root        38  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kintegrityd]
+root        39  0.0  0.0      0     0 ?        S<   Jan19   0:00 [bioset]
+root        41  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kblockd]
+root        42  0.0  0.0      0     0 ?        S<   Jan19   0:00 [ata_sff]
+root        43  0.0  0.0      0     0 ?        S    Jan19   0:00 [khubd]
+root        44  0.0  0.0      0     0 ?        S<   Jan19   0:00 [md]
+root        45  0.0  0.0      0     0 ?        S<   Jan19   0:00 [devfreq_wq]
+root        46  0.0  0.0      0     0 ?        S    Jan19   0:25 [kworker/0:1]
+root        48  0.0  0.0      0     0 ?        S    Jan19   0:00 [khungtaskd]
+root        49  0.0  0.0      0     0 ?        S    Jan19   0:00 [kswapd0]
+root        50  0.0  0.0      0     0 ?        SN   Jan19   0:00 [ksmd]
+root        51  0.0  0.0      0     0 ?        SN   Jan19   0:04 [khugepaged]
+root        52  0.0  0.0      0     0 ?        S    Jan19   0:00 [fsnotify_mark]
+root        53  0.0  0.0      0     0 ?        S    Jan19   0:00 [ecryptfs-kthrea]
+root        54  0.0  0.0      0     0 ?        S<   Jan19   0:00 [crypto]
+root        66  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kthrotld]
+root        68  0.0  0.0      0     0 ?        S    Jan19   0:05 [kworker/2:1]
+root        87  0.0  0.0      0     0 ?        S<   Jan19   0:00 [deferwq]
+root        88  0.0  0.0      0     0 ?        S<   Jan19   0:00 [charger_manager]
+root       351  0.0  0.0      0     0 ?        S    Jan19   0:00 [scsi_eh_0]
+root       352  0.0  0.0      0     0 ?        S    Jan19   0:00 [scsi_eh_1]
+root       353  0.0  0.0      0     0 ?        S    Jan19   0:00 [scsi_eh_2]
+root       354  0.0  0.0      0     0 ?        S    Jan19   0:00 [scsi_eh_3]
+root       355  0.0  0.0      0     0 ?        S    Jan19   0:00 [scsi_eh_4]
+root       361  0.0  0.0      0     0 ?        S<   Jan19   0:00 [raid5wq]
+root       382  0.0  0.0      0     0 ?        S    Jan19   0:06 [kworker/1:1]
+root       403  0.0  0.0      0     0 ?        S    Jan19   0:00 [jbd2/sda1-8]
+root       404  0.0  0.0      0     0 ?        S<   Jan19   0:00 [ext4-rsv-conver]
+root       423  0.0  0.0      0     0 ?        S    Jan19   0:05 [kworker/3:1]
+root       472  0.0  0.0      0     0 ?        S<   Jan19   0:07 [kworker/u9:1]
+root       488  0.0  0.0  17232   636 ?        S    Jan19   0:00 upstart-udev-bridge --daemon
+root       493  0.0  0.0  21772  1604 ?        Ss   Jan19   0:00 /sbin/udevd --daemon
+root       510  0.0  0.0      0     0 ?        S    Jan19   0:03 [jbd2/sda6-8]
+root       511  0.0  0.0      0     0 ?        S<   Jan19   0:00 [ext4-rsv-conver]
+root       517  0.0  0.0      0     0 ?        S    Jan19   0:00 [jbd2/sda8-8]
+root       518  0.0  0.0      0     0 ?        S<   Jan19   0:00 [ext4-rsv-conver]
+root       521  0.0  0.0      0     0 ?        S    Jan19   0:01 [jbd2/sda7-8]
+root       522  0.0  0.0      0     0 ?        S<   Jan19   0:00 [ext4-rsv-conver]
+root       655  0.0  0.0      0     0 ?        S    Jan19   0:00 [irq/45-mei_me]
+root       795  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kpsmoused]
+root       963  0.0  0.0      0     0 ?        S<   Jan19   0:00 [rpciod]
+root       966  0.0  0.0      0     0 ?        S<   Jan19   0:00 [kvm-irqfd-clean]
+root       976  0.0  0.0      0     0 ?        S<   Jan19   0:00 [nfsiod]
+root      1057  0.0  0.0 249852  5160 ?        Sl   Jan19   0:16 rsyslogd -c5
+root      1059  0.0  0.0  15188   392 ?        S    Jan19   0:00 upstart-socket-bridge --daemon
+root      1063  0.0  0.0  25540   680 ?        Ss   Jan19   0:00 rpc.idmapd
+root      1065  0.0  0.0  19200  1092 ?        Ss   Jan19   0:00 rpcbind -w
+statd     1090  0.0  0.0  21560  1540 ?        Ss   Jan19   0:00 rpc.statd -L
+72        1093  0.0  0.0  24456  1764 ?        Ss   Jan19   0:02 dbus-daemon --system --fork --activation=upstart
+root      1105  0.0  0.0  21188  1696 ?        Ss   Jan19   0:00 /usr/sbin/bluetoothd
+root      1131  0.0  0.0      0     0 ?        S<   Jan19   0:00 [krfcommd]
+root      1151  0.0  0.0      0     0 ?        S<   Jan19   0:00 [hd-audio1]
+root      1152  0.0  0.0      0     0 ?        S<   Jan19   0:00 [hd-audio0]
+root      1354  0.0  0.0   7264   600 ?        Ss   Jan19   0:00 dhclient3 -e IF_METRIC=100 -pf /var/run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -1 eth0
+root      1393  0.0  0.0  50040  2768 ?        Ss   Jan19   0:00 /usr/sbin/sshd -D
+root      1436  0.0  0.0   4400   692 ?        Ss   Jan19   0:00 /bin/sh /local/libexec/machineauth/machineauth
+root      1454  0.0  0.0   4400   612 ?        Ss   Jan19   0:00 /bin/sh /usr/bin/svscanboot
+root      1464  0.0  0.0  19112  1036 ?        Ss   Jan19   0:02 cron
+root      1473  0.0  0.0  24148  1400 ?        Ss   Jan19   0:00 SCREEN -Dm su mauth -c ssh -o BatchMode=yes -o ServerAliveCountMax=3 -o ServerAliveInterval=10 -o ConnectTimeout=25 -o SetupTimeOut=25 fw2 1>/dev/null 2>/dev/null
+root      1495  0.0  0.0   4340   484 ?        S    Jan19   0:07 svscan /etc/service
+root      1496  0.0  0.0   4156   348 ?        S    Jan19   0:00 readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................
+root      1500  0.0  0.0   4168   352 ?        S    Jan19   0:00 supervise cfexecd
+root      1501  0.0  0.0   4168   344 ?        S    Jan19   0:00 supervise log
+root      1502  0.0  0.0   4168   348 ?        S    Jan19   0:00 supervise kdm
+root      1503  0.0  0.0   4168   348 ?        S    Jan19   0:00 supervise log
+root      1504  0.0  0.0   4168   352 ?        S    Jan19   0:00 supervise cfenvd
+root      1505  0.0  0.0   4168   348 ?        S    Jan19   0:00 supervise log
+root      1506  0.0  0.0   4168   352 ?        S    Jan19   0:00 supervise smartd
+root      1507  0.0  0.0   4168   348 ?        S    Jan19   0:00 supervise log
+root      1508  0.0  0.0   4168   352 ?        S    Jan19   0:00 supervise qmail-send
+root      1509  0.0  0.0   4168   348 ?        S    Jan19   0:00 supervise log
+root      1510  0.0  0.0   4168   348 ?        S    Jan19   0:00 supervise ntpd
+root      1511  0.0  0.0   4168   352 ?        S    Jan19   0:00 supervise log
+mauth     1512  0.0  0.0  59248  1824 pts/0    Ss+  Jan19   0:00 su mauth -c ssh -o BatchMode=yes -o ServerAliveCountMax=3 -o ServerAliveInterval=10 -o ConnectTimeout=25 -o SetupTimeOut=25 fw2 1>/dev/null 2>/dev/null
+root      1514  0.0  0.0   4400   680 ?        S    Jan19   0:00 /bin/sh /var/cfengine/local/cfengine_scheduler.sh
+nobody    1515  0.0  0.0   4304   352 ?        S    Jan19   0:00 logger -p daemon.err -t cfenvd
+qmails    1516  0.0  0.0   2172   408 ?        S    Jan19   0:00 qmail-send
+nobody    1517  0.0  0.0   4304   348 ?        S    Jan19   0:00 logger -i -t smartd -p daemon.info
+nobody    1518  0.0  0.0   4304   640 ?        S    Jan19   0:00 logger -i -t ntpd -p daemon.info
+nobody    1519  0.0  0.0   4304   348 ?        S    Jan19   0:00 logger -i -t kdm -p daemon.info
+nobody    1520  0.0  0.0   4304   628 ?        S    Jan19   0:00 logger -p daemon.err -t cfexecd
+root      1522  0.0  0.0 513144  1992 ?        Ssl  Jan19   0:30 /usr/sbin/automount
+root      1524  0.0  0.0  26852  1208 ?        S    Jan19   0:00 kdm -nodaemon -config /etc/X11/kdm/kdmrc
+root      1527  0.0  0.0  27232  3204 ?        S    Jan19   0:10 cfenvd -F
+root      1528  0.0  0.0  19612  2220 ?        S    Jan19   0:00 smartd --no-fork --quit=errors --interval=1800 --configfile=/etc/smartd.conf --logfacility=daemon --pidfile=/var/run/smartd.pid
+qmaill    1529  0.0  0.0   2148   480 ?        S    Jan19   0:00 splogger qmail
+root      1564  0.0  0.0   2156   276 ?        S    Jan19   0:00 qmail-lspawn |dot-forward .forward?|preline procmail
+qmailr    1565  0.0  0.0   2152   276 ?        S    Jan19   0:00 qmail-rspawn
+qmailq    1566  0.0  0.0   2136   380 ?        S    Jan19   0:00 qmail-clean
+qmails    1567  0.0  0.0   2160   408 ?        S    Jan19   0:00 qmail-todo
+qmailq    1568  0.0  0.0   2136   380 ?        S    Jan19   0:00 qmail-clean
+daemon    1594  0.1  0.0  30872   668 ?        Ss   Jan19  17:05 lpd Waiting  
+mauth     1610  0.0  0.0   9420  1152 pts/0    S+   Jan19   0:00 bash -c ssh -o BatchMode=yes -o ServerAliveCountMax=3 -o ServerAliveInterval=10 -o ConnectTimeout=25 -o SetupTimeOut=25 fw2 1>/dev/null 2>/dev/null
+mauth     1612  0.0  0.0  41532  3004 pts/0    S+   Jan19   0:05 ssh -o BatchMode=yes -o ServerAliveCountMax=3 -o ServerAliveInterval=10 -o ConnectTimeout=25 -o SetupTimeOut=25 fw2
+root      1634  0.0  0.0      0     0 ?        S<   Jan19   0:00 [nfsd4]
+root      1635  0.0  0.0      0     0 ?        S<   Jan19   0:00 [nfsd4_callbacks]
+root      1636  0.0  0.0      0     0 ?        S    Jan19   0:00 [lockd]
+root      1639  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1640  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1641  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1642  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1643  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1644  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1645  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1646  0.0  0.0      0     0 ?        S    Jan19   0:00 [nfsd]
+root      1650  0.0  0.0  24008   944 ?        Ss   Jan19   0:00 /usr/sbin/rpc.mountd --manage-gids
+root      1738  0.0  0.0  13240   476 ?        Ss   Jan19   0:00 /sbin/mdadm --monitor --pid-file /var/run/mdadm/monitor.pid --daemonise --scan --syslog
+ntp       1826  0.0  0.0  33544  2672 ?        S    Jan19   0:19 ntpd -u ntp:ntp -n -g -c /etc/ntp.conf -p /var/run/ntpd.pid
+root      3041  0.0  0.0      0     0 ?        S<   Jan24   0:02 [kworker/u9:0]
+root     31152  0.0  0.0      0     0 ?        S    14:14   0:00 [kworker/u8:1]
+root     32707  0.0  0.0      0     0 ?        S    14:45   0:00 [kworker/3:0]
+root     32815  0.0  0.0      0     0 ?        S    Jan25   0:00 [kworker/1:0]
+root     33365  0.0  0.0      0     0 ?        S    15:04   0:00 [kworker/0:0]
+root     34268  0.0  0.0      0     0 ?        S    15:14   0:00 [kworker/u8:2]
+root     34778  0.6  3.1 466356 252384 tty7    Ssl+ 15:19   0:23 /usr/bin/X -br :0 vt7 -nolisten tcp -auth /var/run/xauth/A:0-fWy5Fa
+root     34784  0.0  0.0  80052  2828 ?        S    15:19   0:00 -:0                                     
+c4yuanyf 34809  0.0  0.0   1996   276 ?        Ss   15:19   0:00 endxsession::0 /var/shell/bash -l /h/u8/c4/00/c4yuanyf/.xwm
+root     34857  0.0  0.0  21768  1128 ?        S    15:19   0:00 /sbin/udevd --daemon
+root     34859  0.0  0.0  21768  1020 ?        S    15:19   0:00 /sbin/udevd --daemon
+c4yuanyf 35013  0.0  0.0   9428  1376 ?        S    15:19   0:00 /var/shell/bash -l /h/u8/c4/00/c4yuanyf/.xwm
+c4yuanyf 35023  0.0  0.0   9472  1384 ?        S    15:19   0:00 /bin/bash /local/bin/startkde
+c4yuanyf 35034  0.0  0.0   4400   744 ?        S    15:19   0:00 /bin/sh /usr/bin/startkde
+c4yuanyf 35075  0.0  0.0  26560   808 ?        S    15:19   0:00 dbus-launch --sh-syntax --exit-with-session
+c4yuanyf 35076  0.0  0.0  24188  1268 ?        Ss   15:19   0:00 //bin/dbus-daemon --fork --print-pid 5 --print-address 7 --session
+c4yuanyf 35087  0.0  0.0   4160    88 ?        S    15:19   0:00 /usr/lib/kde4/libexec/start_kdeinit +kcminit_startup
+c4yuanyf 35088  0.0  0.3 333376 25148 ?        Ss   15:19   0:00 kdeinit4: kdeinit4 Running...                  
+c4yuanyf 35089  0.0  0.1 337288 10708 ?        S    15:19   0:00 kdeinit4: klauncher [kdeinit] --fd=9           
+c4yuanyf 35091  0.0  0.3 810120 26568 ?        Sl   15:19   0:00 kdeinit4: kded4 [kdeinit]                      
+c4yuanyf 35095  0.0  0.2 275280 16328 ?        S    15:19   0:00 /usr/bin/kglobalaccel
+c4yuanyf 35099  0.0  0.2 280392 16940 ?        S    15:19   0:00 /usr/bin/kactivitymanagerd
+c4yuanyf 35102  0.0  0.0   4296   348 ?        S    15:19   0:00 kwrapper4 ksmserver
+c4yuanyf 35103  0.0  0.2 500448 18884 ?        Sl   15:19   0:00 kdeinit4: ksmserver [kdeinit]                  
+c4yuanyf 35105  0.3  0.7 729928 62592 ?        Sl   15:19   0:12 kwin
+c4yuanyf 35110  0.0  0.3 1045516 31740 ?       Sl   15:19   0:00 /usr/bin/knotify4
+c4yuanyf 35115  0.0  1.0 1002852 88016 ?       Sl   15:19   0:03 /usr/bin/plasma-desktop
+c4yuanyf 35120  0.0  0.2 272428 17136 ?        S    15:19   0:00 /usr/bin/kuiserver
+c4yuanyf 35137  0.0  0.2 314656 17796 ?        S    15:19   0:00 /usr/bin/kaccess
+c4yuanyf 35144  0.0  0.1 410944  9512 ?        Sl   15:19   0:00 kdeinit4: nepomukserver [kdeinit]              
+c4yuanyf 35148  0.0  0.0      0     0 ?        Z    15:19   0:00 [nepomukserver] <defunct>
+c4yuanyf 35150  0.0  0.0 417800  5884 ?        Sl   15:19   0:00 /usr/bin/zeitgeist-datahub
+c4yuanyf 35157  0.0  0.0 348144  6668 ?        Sl   15:19   0:00 /usr/bin/zeitgeist-daemon
+c4yuanyf 35159  0.0  0.4 684064 38908 ?        Sl   15:19   0:00 /usr/bin/krunner
+c4yuanyf 35161  0.0  0.3 656504 27220 ?        Sl   15:19   0:00 /usr/bin/kmix
+c4yuanyf 35164  0.0  0.2 289256 18304 ?        S    15:19   0:00 /usr/bin/klipper
+c4yuanyf 35169  0.0  0.0 408864  5776 ?        S<l  15:19   0:00 /usr/bin/pulseaudio --start --log-target=syslog
+c4yuanyf 35175  0.0  0.1 245728  9076 ?        Sl   15:19   0:00 /usr/lib/zeitgeist/zeitgeist-fts
+c4yuanyf 35184  0.0  0.0  45356  2316 ?        S    15:19   0:00 /usr/lib/gvfs/gvfsd
+c4yuanyf 35187  0.0  0.0   4328   352 ?        S    15:19   0:00 /bin/cat
+c4yuanyf 35224  2.5  5.2 1478308 422180 ?      Sl   15:19   1:32 /usr/lib/firefox/firefox
+c4yuanyf 35235  0.0  0.0  49896  2556 ?        S    15:19   0:00 /usr/lib/x86_64-linux-gnu/gconf/gconfd-2
+c4yuanyf 35583  0.2  0.3 501364 29860 ?        Sl   15:27   0:06 /usr/bin/konsole
+c4yuanyf 36314  0.0  0.0  18088  2080 pts/3    Ss   15:44   0:00 /var/shell/bash
+c4yuanyf 36705  0.0  0.0  15832  1936 pts/3    T    15:51   0:00 man cut
+c4yuanyf 36716  0.0  0.0  10892   768 pts/3    T    15:51   0:00 pager -s
+c4yuanyf 37128  0.0  0.0  15832  1936 pts/3    T    16:03   0:00 man grep
+c4yuanyf 37137  0.0  0.0  10892   760 pts/3    T    16:03   0:00 pager -s
+c4yuanyf 37400  0.0  0.0  15832  1936 pts/3    T    16:08   0:00 man wc
+c4yuanyf 37411  0.0  0.0  10892   764 pts/3    T    16:08   0:00 pager -s
+c4yuanyf 37434  0.0  0.0  15832  1936 pts/3    T    16:09   0:00 man grep
+c4yuanyf 37445  0.0  0.0  10892   764 pts/3    T    16:09   0:00 pager -s
+root     38164  0.0  0.0   4308   352 ?        S    16:19   0:00 sleep 300
+c4yuanyf 38165  0.0  0.0  15280  1160 pts/3    R+   16:19   0:00 ps aux
+root     58376  0.0  0.0 2093804 4064 ?        Sl   Jan20   0:00 /usr/sbin/console-kit-daemon --no-daemon
+root     58443  0.0  0.0 195432  6180 ?        Sl   Jan20   0:02 /usr/lib/policykit-1/polkitd --no-debug
+root     58746  0.0  0.0 219904  4340 ?        Sl   Jan20   0:00 /usr/lib/upower/upowerd
+root     58807  0.0  0.0 193408  3964 ?        Sl   Jan20   0:09 /usr/lib/udisks/udisks-daemon
+root     58812  0.0  0.0  45516   796 ?        S    Jan20   0:00 udisks-daemon: not polling any devices
+rtkit    58953  0.0  0.0 168872  1324 ?        SNl  Jan20   0:03 /usr/lib/rtkit/rtkit-daemon
