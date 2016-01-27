@@ -1,0 +1,4 @@
+ name: Ye Yuan	cdf:c4yuanyf
+0,1,8502,/u/csc209h/winter/pub/bin/checkstep1 ,Step 1 successfully completed.
+1,2,8502,/u/csc209h/winter/pub/bin/checkstep2 ,The SHELL variable is not bash
+1,2,8502,/u/csc209h/winter/pub/bin/checkstep2 ,The SHELL variable is not bash
