@@ -18,15 +18,14 @@ int main(int argc,char **argv)
     }
 
     int line=0;
-    max[2]="0";
-    max[3]="0";
     while(1){
     	if(done)
 	    	break;
     	//we only wants the useful data, so skip line 1
     	if(line==0){
     	//	printf("here\n");
-    		scanf("%s",first_line);
+    		for(j=0;j<11;j++)
+    			scanf("%s",max[j]);
     	}
     	else{
     	
@@ -37,9 +36,11 @@ int main(int argc,char **argv)
 	    			done=1;
 	    			break;
 	    		}
-	    		//printf("argc=%d argv[2]=%s\n",argc,argv[2] );
-	    		if(argc==3&&argv[1]=="-m"){
-	    			printf("here\n");
+	    		//printf("argc=%d argv[1]=%s\n",argc,argv[1] );
+	    		if(argc==3){
+	    		//	printf("arv[1]=%s\n",argv[1] );
+	    			if(argv[1]=="-m")
+	    				printf("%s\n","equal" );
 	    			if(tmp[0]==argv[2]&&strtol(tmp[3],NULL,10)>strtol(max[3],NULL,10)){
 	    				for(j=0;j<11;j++){
 	    					flag[j]=tmp[j];
@@ -62,7 +63,7 @@ int main(int argc,char **argv)
     	}
     	line++;
     } 
-    for(j=0;j<11;j++){
+    /*for(j=0;j<11;j++){
 	    printf("%s ",max[j]);
-	}      
+	} */     
 }
