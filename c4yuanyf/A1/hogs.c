@@ -47,7 +47,7 @@ int main(int argc,char **argv)
 	    	}	
 		    if(argc==3){
 		   		if(strcmp(argv[1],"-m")==0&&strcmp(tmp[0],argv[2])==0){
-		   			if(strtof(tmp[3],NULL)>strtof(max[3],NULL)){
+		   			if(strtof(tmp[3],NULL)>strtof(max[3],NULL)||(strtof(tmp[3],NULL)==strtof(max[3],NULL)&&strcasecmp(tmp[10],max[10])<0)){
 		   				inited=1;
 			   			for(j=0;j<11;j++){
 			   				strcpy(max[j],tmp[j]);
@@ -56,7 +56,7 @@ int main(int argc,char **argv)
 	    		}
 
 	    		if(strcmp(argv[1],"-c")==0&&strcmp(tmp[0],argv[2])==0){
-	    			if(strtof(tmp[2],NULL)>strtof(max[2],NULL)){
+	    			if(strtof(tmp[2],NULL)>strtof(max[2],NULL)||(strtof(tmp[2],NULL)==strtof(max[2],NULL)&&strcasecmp(tmp[10],max[10])<0)){
 	    				inited=1;
 		   				for(j=0;j<11;j++){
 		   					strcpy(max[j],tmp[j]);

@@ -26,4 +26,15 @@ int main(int argc, char **argv){
 	printf("%s  %p\n",tmp,tmp);//old address
 	printf("%s %p\n",str,str);//new address
 
+
+	char str_stack[20]="how are you";
+	printf("%s %p\n",str_stack,str_stack );
+	strcpy(str_stack,"nice");//same address
+	printf("%s %p\n",str_stack,str_stack);
+
+	char *str_heap=malloc(sizeof(char)*20);
+	strcpy(str_heap,"how are you");
+	printf("%s %p\n",str_heap,str_heap);
+	strcpy(str_heap,"nice");//same address
+	printf("%s %p\n",str_heap,str_heap);
 }
