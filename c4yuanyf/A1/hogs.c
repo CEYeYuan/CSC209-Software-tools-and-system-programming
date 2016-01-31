@@ -4,7 +4,7 @@
  
 int main(int argc,char **argv)
 {
-    int i,j,inited,done,line;
+    int j,inited,done,line;
     char tmp[11][256];//buffer for each line
     char max[11][256];//buffer for the process with max usage
     strcpy(max[2],"-1");
@@ -74,5 +74,6 @@ int main(int argc,char **argv)
    		else
    			printf("%s\t%.1f\t%s\n", max[1],strtof(max[2],NULL),max[10]);
     }
+    return 0;
    
 }
