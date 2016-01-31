@@ -3,9 +3,33 @@ svn:wc:ra_dav:version-url
 V 42
 /svn/csc209-2016-01/c4yuanyf/!svn/ver/1/A1
 END
+a.out
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/csc209-2016-01/c4yuanyf/!svn/ver/3/A1/a.out
+END
+a.txt
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/csc209-2016-01/c4yuanyf/!svn/ver/3/A1/a.txt
+END
 results.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
 /svn/csc209-2016-01/c4yuanyf/!svn/ver/2/A1/results.txt
+END
+hogs
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/csc209-2016-01/c4yuanyf/!svn/ver/4/A1/hogs
+END
+hogs.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/csc209-2016-01/c4yuanyf/!svn/ver/3/A1/hogs.c
 END
