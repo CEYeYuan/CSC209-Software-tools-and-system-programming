@@ -1,0 +1,14 @@
+gcc -g sample.c		compile with debugging info
+gdb a.out			start gdb
+run
+break main			
+next				run next line
+step				run next line(if that's a function, step into that function)
+info locals
+print var
+x/24b 	address		examine that address(24 bytes starting that address)
+x/24bc	address		interpret them as characters
+x/24bx	address		interpret them as hex numbers
+x/8bc	pointer		the same effect
+
+for the intel architecture, stack grows down
