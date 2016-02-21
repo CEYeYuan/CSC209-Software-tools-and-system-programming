@@ -17,32 +17,32 @@
 
 int create_user(const char *name, User **user_ptr_add) {
     if(strlen(name) >= MAX_NAME)//too long
-    	return -2;
+    	return 2;
+    if(find_user(name,*user_ptr_add) != NULL)
+    	return 1;
 
     else if(*user_ptr_add == NULL){
     	//not inited yet
     	*user_ptr_add = malloc(sizeof(User));
+    	if(*user_ptr_add == NULL)//malloc fails
+    		return -1;
     	strcpy((*user_ptr_add)->name,name);
     	(*user_ptr_add)->next = NULL;
+    	return 0;
     }else{
     	//check if the name is already used while walk through the list
     	User *current = *user_ptr_add;
     	while(current->next != NULL){
-    		if(strcmp(current->name,name) == 0)
-    			return -1;
     		current = current->next;
-    	}
-    	// now hit the tail of the list
-    	if(strcmp(current->name,name) == 0)
-    		return -1;
-    	else{
-    		//add the user to the end of the list
-    		User *new_user = malloc(sizeof(User));
-    		strcpy(new_user->name,name);
-    		new_user->next = NULL;
-    		current->next = new_user;
-    		return 0;
-    	}
+    	}	
+		//add the user to the end of the list
+		User *new_user = malloc(sizeof(User));
+		if(new_user == NULL)// malloc fails
+			return -1;
+		strcpy(new_user->name,name);
+		new_user->next = NULL;
+		current->next = new_user;
+		return 0;	
     }
     return 0;
 }
@@ -96,10 +96,10 @@ void list_users(const User *curr) {
 int update_pic(User *user, const char *filename) {
 	if(user == NULL)	return -100;//should not happen
     if(strlen(filename) >= MAX_NAME)// too long
-    	return -2;	
+    	return 2;	
     FILE *file = fopen(filename, "r");
     if(file == NULL)
-    	return -1;
+    	return 1;
     fclose(file);
     strcpy(user->profile_pic,filename);
     return 0;
@@ -126,15 +126,8 @@ int update_pic(User *user, const char *filename) {
 int make_friends(const char *name1, const char *name2, User *head) {
     if(strcmp(name1,name2) == 0)
     	return 3;
-    User *s1 = NULL;
-    User *s2 = NULL;
-    while(head != NULL){
-    	if(strcmp(head->name,name1)==0)
-    		s1 = head;
-    	if(strcmp(head->name,name2)==0)
-    		s2 = head;
-    	head = head->next;
-    }
+    User *s1 = find_user(name1,head);
+    User *s2 = find_user(name1,head);
     if(s1 == NULL || s2 == NULL)
     	return 4;
     //when reach this line, both two users are not null
@@ -175,16 +168,10 @@ int make_friends(const char *name1, const char *name2, User *head) {
  *   - 0 on success.
  *   - 1 if the user is NULL.
  */
- typedef struct user {
-    char name[MAX_NAME];
-    char profile_pic[MAX_NAME];  // This is a *filename*, not the file contents.
-    struct post *first_post;
-    struct user *friends[MAX_FRIENDS];
-    struct user *next;
-} User; name ,friends
+ 
 int print_user(const User *user) {
 	if(user == NULL)
-		return -1;
+		return 1;
 	if(user->profile_pic != NULL){//that member is not null
 		FILE *file = fopen(user->profile_pic,"r");
 		char line[256];
@@ -197,12 +184,36 @@ int print_user(const User *user) {
 			fclose(file);
 		}
 	}
-	assert(user->name != NULL);
-	printf("Name: %s\n",user->name );
+	if(user->name != NULL){//should always happen
+		printf("Name: %s\n",user->name );
+	}
 	printf("\n------------------------------------------\n");
 	printf("Friends:\n");
+	//print friend list
+	User **friends = ((User *)user)->friends;
+	int i=0;
+	while(friends[i] != NULL && i < MAX_FRIENDS){
+		printf("%s\n",friends[i]->name);
+		i++;
+	}
 	printf("------------------------------------------\n");
-    
+	printf("Posts:\n");
+	//print post list
+	Post *p = user->first_post;
+	if(p != NULL){
+		while(p->next != NULL){//last post need special treatment
+			printf("From: %s\n",p->author);
+			printf("Date: %s\n\n",ctime(p->date));
+			printf("%s\n\n",p->contents);
+			printf("===\n\n");
+			p = p->next;
+		}
+		printf("From: %s\n",p->author);//print the last post
+		printf("Date: %s\n\n",ctime(p->date));
+		printf("%s\n",p->contents);
+	}
+	printf("------------------------------------------\n");
+    return 0;
 }
 
 
@@ -223,7 +234,34 @@ int print_user(const User *user) {
  *   - 2 if either User pointer is NULL
  */
 int make_post(const User *author, User *target, char *contents) {
-    return -1;
+    if(author == NULL || target == NULL)
+    	return 2;
+    User **list = ((User *)author)->friends;
+    int i = 0;
+    int isFriend=0;
+    while(list[i] != NULL){
+    	if(strcmp(list[i]->name,target->name) == 0){
+    		isFriend = 1;
+    		break;
+   		}
+   		i++;
+    }
+    if(isFriend == 0)
+    	return 1;
+    else{
+    	Post *p = malloc(sizeof(Post));
+    	if(p == NULL)//check if malloc fails
+    		return -1;
+    	strcpy(p->author,author->name);
+    	p->contents = contents;
+    	p->date = malloc(sizeof(time_t));
+    	if(p->date == NULL)//check if malloc fails
+    		return -1;
+    	time(p->date);
+    	p->next = target->first_post;
+    	target->first_post = p;
+    	return 0;
+    }
 }
 
 
@@ -237,5 +275,34 @@ int make_post(const User *author, User *target, char *contents) {
  *   - 1 if a user with this name does not exist.
  */
 int delete_user(const char *name, User **user_ptr_del) {
-    return -1;
+    User *del = find_user(name,*user_ptr_del);
+    if(del == NULL)
+    	return 1;
+  	if(strcmp((*user_ptr_del)->name,name) == 0)//first user of the list
+  		*user_ptr_del = (*user_ptr_del)->next;
+  	else{
+  		//find the previous user of the deleted, set its next ptr to del->next
+  		User *prev = *user_ptr_del;
+  		while(strcmp(prev->name,name) != 0){
+  			prev = prev->next;
+  		}
+  		prev->next = del->next;
+  		free(del);
+  		//remove the deleted user from the friend list
+  		User *cur = *user_ptr_del;
+  		while(cur != NULL){
+  			User **friends = cur->friends;
+  			int i =0;
+  			for(i=0 ; i<MAX_FRIENDS ; i++){
+  				if(friends[i] != NULL && strcmp(friends[i]->name,name) == 0){
+  					//they are friends
+  					friends[i] = NULL;
+  					break;// same friends can't repeat twice
+  				}
+  			}
+  			cur = cur->next;
+  		}
+  	}
+  	free(del);
+  	return 0;
 }
