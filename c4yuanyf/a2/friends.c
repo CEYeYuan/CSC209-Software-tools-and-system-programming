@@ -133,7 +133,7 @@ int make_friends(const char *name1, const char *name2, User *head) {
     		s1 = head;
     	if(strcmp(head->name,name2)==0)
     		s2 = head;
-    	head = head.next;
+    	head = head->next;
     }
     if(s1 == NULL || s2 == NULL)
     	return 4;
@@ -141,11 +141,11 @@ int make_friends(const char *name1, const char *name2, User *head) {
     //since the friends are filled in order, we only need to check if the 
     //last friends is null to know if a user has already get max friends
     if((*s1).friends[MAX_FRIENDS-1] != NULL ||
-       (*s2).friends[MAX_FRIENDS-1] != NULL ))
+       (*s2).friends[MAX_FRIENDS-1] != NULL )
 		return 2;
 	//now we're sure both of them are not null. Since friends are symmetric, 
 	//if they're already friends, we only need to check one friend list
-	User *friend_list = *(s1->friends);
+	User** friend_list = s1->friends;
 	int index = 0;
 	while(friend_list[index] != NULL){
 		if(strcmp(friend_list[index]->name,name2) == 0)
@@ -154,7 +154,7 @@ int make_friends(const char *name1, const char *name2, User *head) {
 	}
 	friend_list[index] = s2;//add s2 to s1's list
 
-	friend_list = *(s2->friends);
+	friend_list = s2->friends;
 	index = 0;
 	while(friend_list[index] != NULL){
 		if(strcmp(friend_list[index]->name,name1) == 0)
@@ -175,8 +175,34 @@ int make_friends(const char *name1, const char *name2, User *head) {
  *   - 0 on success.
  *   - 1 if the user is NULL.
  */
+ typedef struct user {
+    char name[MAX_NAME];
+    char profile_pic[MAX_NAME];  // This is a *filename*, not the file contents.
+    struct post *first_post;
+    struct user *friends[MAX_FRIENDS];
+    struct user *next;
+} User; name ,friends
 int print_user(const User *user) {
-    return -1;
+	if(user == NULL)
+		return -1;
+	if(user->profile_pic != NULL){//that member is not null
+		FILE *file = fopen(user->profile_pic,"r");
+		char line[256];
+		if(file != NULL){//file do exist
+			//print out the profile pic
+			while(fgets(line,256,file) != NULL){
+				//limit the max line to 256
+				fprintf(stdin, "%s\n",line);
+			}
+			fclose(file);
+		}
+	}
+	assert(user->name != NULL);
+	printf("Name: %s\n",user->name );
+	printf("\n------------------------------------------\n");
+	printf("Friends:\n");
+	printf("------------------------------------------\n");
+    
 }
 
 
