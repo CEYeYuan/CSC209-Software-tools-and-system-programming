@@ -126,35 +126,39 @@ int update_pic(User *user, const char *filename) {
 int make_friends(const char *name1, const char *name2, User *head) {
     if(strcmp(name1,name2) == 0)
     	return 3;
-    User *s1 = find_user(name1,head);
-    User *s2 = find_user(name1,head);
-    if(s1 == NULL || s2 == NULL)
+    User *u1 = find_user(name1,head);
+    User *u2 = find_user(name1,head);
+    if(u1 == NULL || u2 == NULL)
     	return 4;
-    //when reach this line, both two users are not null
-    //since the friends are filled in order, we only need to check if the 
-    //last friends is null to know if a user has already get max friends
-    if((*s1).friends[MAX_FRIENDS-1] != NULL ||
-       (*s2).friends[MAX_FRIENDS-1] != NULL )
-		return 2;
-	//now we're sure both of them are not null. Since friends are symmetric, 
-	//if they're already friends, we only need to check one friend list
-	User** friend_list = s1->friends;
+    //check if they're already friends. due to symmetric, only need
+	//to check one of them
+	User** friend_list = u1->friends;
 	int index = 0;
-	while(friend_list[index] != NULL){
-		if(strcmp(friend_list[index]->name,name2) == 0)
-			return 1;
-		index++;
+	for(index = 0 ; index < MAX_FRIENDS ; index++){
+		if(friend_list[index] != NULL){
+			if(strcmp(friend_list[index]->name,name2) == 0)
+				return 1;
+		}
 	}
-	friend_list[index] = s2;//add s2 to s1's list
-
-	friend_list = s2->friends;
-	index = 0;
-	while(friend_list[index] != NULL){
-		if(strcmp(friend_list[index]->name,name1) == 0)
-			return 1;
-		index++;
+	
+    //check if the a user has already get max friends
+    int empty_u1=-1;//the first empty spot of their friend_list
+    int empty_u2=-1;
+    int i =0;
+	for(i=0 ; i < MAX_FRIENDS ; i++){
+		if(u1->friends[i] == NULL && empty_u1 == -1){
+			//make sure only return the first empty spot
+			empty_u1=i;
+		}
+		if(u2->friends[i] == NULL && empty_u2 == -1){
+			//make sure only return the first empty spot
+			empty_u2=i;
+		}
 	}
-	friend_list[index] = s1;// add s1 to s2's list
+	if(empty_u1 == -1 ||empty_u2 == -1)
+		return 2;
+	(*u1).friends[empty_u1] = u2;
+	(*u2).friends[empty_u2] = u1;
 	return 0;
 
 }
