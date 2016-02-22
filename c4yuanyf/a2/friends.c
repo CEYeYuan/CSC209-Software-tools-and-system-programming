@@ -162,7 +162,6 @@ int make_friends(const char *name1, const char *name2, User *head) {
 	}
 	if(empty_u1 == -1 ||empty_u2 == -1)
 		return 2;
-	//printf("u1=%d u2=%d",empty_u1,empty_u2);
 	(*u1).friends[empty_u1] = u2;
 	(*u2).friends[empty_u2] = u1;
 	return 0;
@@ -203,9 +202,9 @@ int print_user(const User *user) {
 	//print friend list
 	User **friends = ((User *)user)->friends;
 	int i=0;
-	while(friends[i] != NULL && i < MAX_FRIENDS){
-		printf("%s\n",friends[i]->name);
-		i++;
+	for(i = 0; i < MAX_FRIENDS ; i++){
+		if(friends[i] != NULL)
+			printf("%s\n",friends[i]->name);
 	}
 	printf("------------------------------------------\n");
 	printf("Posts:\n");
@@ -291,7 +290,6 @@ int delete_user(const char *name, User **user_ptr_del) {
     	return 1;
   	if(strcmp((*user_ptr_del)->name,name) == 0){//first user of the list
   		*user_ptr_del = (*user_ptr_del)->next;
-  		free(del);
   	}
   	else{
   		//find the previous user of the deleted, set its next ptr to del->next
@@ -300,7 +298,6 @@ int delete_user(const char *name, User **user_ptr_del) {
   			prev = prev->next;
   		}
   		prev->next = del->next;
-  		free(del);
   	}
   		//remove the deleted user from the friend list
 	User *cur = *user_ptr_del;
@@ -316,6 +313,7 @@ int delete_user(const char *name, User **user_ptr_del) {
 		}
 		cur = cur->next;
 	}
+	free(del);//free memory of that user
 	return 0;
 }
   		
