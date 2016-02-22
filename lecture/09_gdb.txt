@@ -6,9 +6,25 @@ next				run next line
 step				run next line(if that's a function, step into that function)
 info locals
 print var
+ptype var			print the type of a variable
 x/24b 	address		examine that address(24 bytes starting that address)
 x/24bc	address		interpret them as characters
 x/24bx	address		interpret them as hex numbers
 x/8bc	pointer		the same effect
 
 for the intel architecture, stack grows down
+
+You can run gdb with --args parameter
+gdb --args executablename arg1 arg2 arg3
+
+So we received the SIGSEGV signal from the operating system. This means that we tried to access an invalid memory address. Let's take a backtrace:
+(gdb) backtrace
+
+(gdb) backtrace
+#0  0x4007fc13 in _IO_getline_info () from /lib/libc.so.6
+#1  0x4007fb6c in _IO_getline () from /lib/libc.so.6
+#2  0x4007ef51 in fgets () from /lib/libc.so.6
+#3  0x80484b2 in main (argc=1, argv=0xbffffaf4) at segfault.c:10
+#4  0x40037f5c in __libc_start_main () from /lib/libc.so.6
+
+frame i 			jump to the frame we are interested

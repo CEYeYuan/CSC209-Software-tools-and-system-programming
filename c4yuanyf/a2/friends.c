@@ -41,6 +41,10 @@ int create_user(const char *name, User **user_ptr_add) {
 			return -1;
 		strcpy(new_user->name,name);
 		new_user->next = NULL;
+		int i ;
+		for(i = 0 ; i < MAX_FRIENDS ; i++){
+			(new_user->friends)[i] = NULL;
+		}
 		current->next = new_user;
 		return 0;	
     }
@@ -75,9 +79,10 @@ User *find_user(const char *name, const User *head) {
  * Names should be printed to standard output, one per line.
  */
 void list_users(const User *curr) {
+	printf("%s\n","User List" );
 	while(curr != NULL){
 		if (curr-> name != NULL)
-			fprintf(stdout, "%s\n",curr->name );
+			fprintf(stdout, "\t%s\n",curr->name );
 		else
 			fprintf(stderr, "%s\n"," Name is NULL " );
 		curr = curr->next;
@@ -127,7 +132,7 @@ int make_friends(const char *name1, const char *name2, User *head) {
     if(strcmp(name1,name2) == 0)
     	return 3;
     User *u1 = find_user(name1,head);
-    User *u2 = find_user(name1,head);
+    User *u2 = find_user(name2,head);
     if(u1 == NULL || u2 == NULL)
     	return 4;
     //check if they're already friends. due to symmetric, only need
@@ -157,6 +162,7 @@ int make_friends(const char *name1, const char *name2, User *head) {
 	}
 	if(empty_u1 == -1 ||empty_u2 == -1)
 		return 2;
+	//printf("u1=%d u2=%d",empty_u1,empty_u2);
 	(*u1).friends[empty_u1] = u2;
 	(*u2).friends[empty_u2] = u1;
 	return 0;
@@ -183,8 +189,9 @@ int print_user(const User *user) {
 			//print out the profile pic
 			while(fgets(line,256,file) != NULL){
 				//limit the max line to 256
-				fprintf(stdin, "%s\n",line);
+				fprintf(stdout, "%s",line);
 			}
+			fprintf(stdout, "\n\n");
 			fclose(file);
 		}
 	}
@@ -207,13 +214,13 @@ int print_user(const User *user) {
 	if(p != NULL){
 		while(p->next != NULL){//last post need special treatment
 			printf("From: %s\n",p->author);
-			printf("Date: %s\n\n",ctime(p->date));
+			printf("Date: %s\n",ctime(p->date));
 			printf("%s\n\n",p->contents);
 			printf("===\n\n");
 			p = p->next;
 		}
 		printf("From: %s\n",p->author);//print the last post
-		printf("Date: %s\n\n",ctime(p->date));
+		printf("Date: %s\n",ctime(p->date));
 		printf("%s\n",p->contents);
 	}
 	printf("------------------------------------------\n");
@@ -282,31 +289,34 @@ int delete_user(const char *name, User **user_ptr_del) {
     User *del = find_user(name,*user_ptr_del);
     if(del == NULL)
     	return 1;
-  	if(strcmp((*user_ptr_del)->name,name) == 0)//first user of the list
+  	if(strcmp((*user_ptr_del)->name,name) == 0){//first user of the list
   		*user_ptr_del = (*user_ptr_del)->next;
+  		free(del);
+  	}
   	else{
   		//find the previous user of the deleted, set its next ptr to del->next
   		User *prev = *user_ptr_del;
-  		while(strcmp(prev->name,name) != 0){
+  		while(prev->next != NULL && strcmp(prev->next->name,name) != 0){
   			prev = prev->next;
   		}
   		prev->next = del->next;
   		free(del);
-  		//remove the deleted user from the friend list
-  		User *cur = *user_ptr_del;
-  		while(cur != NULL){
-  			User **friends = cur->friends;
-  			int i =0;
-  			for(i=0 ; i<MAX_FRIENDS ; i++){
-  				if(friends[i] != NULL && strcmp(friends[i]->name,name) == 0){
-  					//they are friends
-  					friends[i] = NULL;
-  					break;// same friends can't repeat twice
-  				}
-  			}
-  			cur = cur->next;
-  		}
   	}
-  	free(del);
-  	return 0;
+  		//remove the deleted user from the friend list
+	User *cur = *user_ptr_del;
+	while(cur != NULL){
+		User **friends = cur->friends;
+		int i =0;
+		for(i=0 ; i<MAX_FRIENDS ; i++){
+			if(friends[i] != NULL && strcmp(friends[i]->name,(char *)name) == 0){
+				//they are friends
+				friends[i] = NULL;
+				break;// same friends can't repeat twice	
+			}
+		}
+		cur = cur->next;
+	}
+	return 0;
 }
+  		
+
