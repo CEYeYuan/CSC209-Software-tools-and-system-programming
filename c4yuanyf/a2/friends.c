@@ -313,6 +313,16 @@ int delete_user(const char *name, User **user_ptr_del) {
 		}
 		cur = cur->next;
 	}
+
+	Post *post = del->first_post;
+	//free all the posting received
+	while(post != NULL){
+		Post *tmp = post->next;
+		free(post->contents);
+		free(post->date);
+		free(post);
+		post = tmp;
+	}
 	free(del);//free memory of that user
 	return 0;
 }
