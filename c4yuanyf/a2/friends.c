@@ -18,7 +18,7 @@
 int create_user(const char *name, User **user_ptr_add) {
     if(strlen(name) >= MAX_NAME)//too long
     	return 2;
-    if(find_user(name,*user_ptr_add) != NULL)
+    if(find_user(name,*user_ptr_add) != NULL)//not existed yet
     	return 1;
 
     else if(*user_ptr_add == NULL){
@@ -30,7 +30,7 @@ int create_user(const char *name, User **user_ptr_add) {
     	(*user_ptr_add)->next = NULL;
     	return 0;
     }else{
-    	//check if the name is already used while walk through the list
+    	//go to the end of the list
     	User *current = *user_ptr_add;
     	while(current->next != NULL){
     		current = current->next;
@@ -42,6 +42,7 @@ int create_user(const char *name, User **user_ptr_add) {
 		strcpy(new_user->name,name);
 		new_user->next = NULL;
 		int i ;
+		//this user has no friends yet
 		for(i = 0 ; i < MAX_FRIENDS ; i++){
 			(new_user->friends)[i] = NULL;
 		}
@@ -64,7 +65,7 @@ User *find_user(const char *name, const User *head) {
     	return NULL;
     else{
     	User *ret = (User *)head;
-    	while (ret != NULL){
+    	while (ret != NULL){//walk through the list
     		if(strcmp(ret->name,name) == 0)
     			return ret;
     		ret = ret->next;
@@ -105,8 +106,8 @@ int update_pic(User *user, const char *filename) {
     FILE *file = fopen(filename, "r");
     if(file == NULL)
     	return 1;
-    fclose(file);
     strcpy(user->profile_pic,filename);
+    fclose(file);
     return 0;
 }
 
@@ -129,13 +130,13 @@ int update_pic(User *user, const char *filename) {
  * NOTE: If multiple errors apply, return the *largest* error code that applies.
  */
 int make_friends(const char *name1, const char *name2, User *head) {
-    if(strcmp(name1,name2) == 0)
+    if(strcmp(name1,name2) == 0)//same person
     	return 3;
     User *u1 = find_user(name1,head);
     User *u2 = find_user(name2,head);
-    if(u1 == NULL || u2 == NULL)
+    if(u1 == NULL || u2 == NULL)//at least one user does not exist
     	return 4;
-    //check if they're already friends. due to symmetric, only need
+    //check if they're already friends. due to symmetricy, only need
 	//to check one of them
 	User** friend_list = u1->friends;
 	int index = 0;
@@ -148,7 +149,7 @@ int make_friends(const char *name1, const char *name2, User *head) {
 	
     //check if the a user has already get max friends
     int empty_u1=-1;//the first empty spot of their friend_list
-    int empty_u2=-1;
+    int empty_u2=-1;//-1 means uninited, only init once(first empty spot)
     int i =0;
 	for(i=0 ; i < MAX_FRIENDS ; i++){
 		if(u1->friends[i] == NULL && empty_u1 == -1){
@@ -161,7 +162,7 @@ int make_friends(const char *name1, const char *name2, User *head) {
 		}
 	}
 	if(empty_u1 == -1 ||empty_u2 == -1)
-		return 2;
+		return 2;//full
 	(*u1).friends[empty_u1] = u2;
 	(*u2).friends[empty_u2] = u1;
 	return 0;
@@ -183,11 +184,10 @@ int print_user(const User *user) {
 		return 1;
 	if(user->profile_pic != NULL){//that member is not null
 		FILE *file = fopen(user->profile_pic,"r");
-		char line[256];
+		char line[256];//assume no more than 256 char a line
 		if(file != NULL){//file do exist
 			//print out the profile pic
 			while(fgets(line,256,file) != NULL){
-				//limit the max line to 256
 				fprintf(stdout, "%s",line);
 			}
 			fprintf(stdout, "\n\n");
@@ -244,8 +244,10 @@ int print_user(const User *user) {
  *   - 2 if either User pointer is NULL
  */
 int make_post(const User *author, User *target, char *contents) {
-    if(author == NULL || target == NULL)
+    if(author == NULL || target == NULL){
+    	free(contents);//prevent mem-leak
     	return 2;
+    }
     User **list = ((User *)author)->friends;
     int i = 0;
     int isFriend=0;
@@ -256,8 +258,11 @@ int make_post(const User *author, User *target, char *contents) {
    		}
    		i++;
     }
-    if(isFriend == 0)
+    if(isFriend == 0){
+    	//they're not friends
+    	free(contents);//prevent mem-leak	
     	return 1;
+    }
     else{
     	Post *p = malloc(sizeof(Post));
     	if(p == NULL)//check if malloc fails
