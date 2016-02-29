@@ -1,0 +1,26 @@
+c scope rules:
+	Inside a function or a block which is called local variables.
+	Outside of all functions which is called global variables.
+		Global variables hold their values throughout the lifetime of your
+		program and they can be accessed inside any of the functions defined 
+		for the program.
+		A program can have same name for local and global variables but the 
+		value of local variable inside a function will take preference.
+	In the definition of function parameters which are called formal parameters.
+
+const:
+	const means that something is not modifiable, so a data object that is 
+	declared with const as a part of its type specification must not be assigned 
+	to in any way during the run of a program.
+static:
+	1. A static variable inside a function keeps its value between invocations.
+	2. A static global variable or a function is "seen" only in the file it's 
+	   declared in
+	3.Static functions are not visible outside of the C file they are defined in.
+
+memory structure:
+	heap->stack->data->text
+where are they:
+	const globals(read-only section)
+	normal globals(read-write section)
+	all the malloc(heap)

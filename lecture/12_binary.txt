@@ -1,0 +1,14 @@
+The function for writing binary data to a file is fwrite. We have four parameters to 
+understand here.
+
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+Parameters
+ptr − This is the pointer to the array of elements to be written.
+size − This is the size in bytes of each element to be written.
+nmemb − This is the number of elements, each one with a size of size bytes.
+stream − This is the pointer to a FILE object that specifies an output stream.
+
+fwrite returns the number of elements successfully written to the file, or 0 on error. 
+We typically add error-checking code after fwrite calls, just as we did with I/O calls 
+that manipulate text.
+
