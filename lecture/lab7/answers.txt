@@ -1,0 +1,35 @@
+Question 1: Which lines of output are printed more than once?
+line 11 and line 23 : B and E
+
+Question 2: Write down all the different possible orders for the output Note 
+that this includes output orders that you may not be able to reproduce.
+
+the program would print A first, after the fork, child process would print 
+B C E and parent process would print B D E, so all the possible order would be:
+
+So the second phase has 6! different orders if several context switches can 
+happen.which is around 720 different orders ! To simplify the question, I 
+would just assumethere is only one context swith after the fork(since there 
+is only a few lines of code to run, such assumption is reasonable)
+	1. A B C E B D E (child first)
+	2. A B D E B C E (parent first)
+
+Question 3: How many processes are created including the original parent when
+forkloop is called with 2, 3, and 4 as arguments?
+	not include the main process
+	2: 3 
+	3: 7 
+	4: 15
+
+Question 4: Use an ASCII diagram to show the processes and their relationships
+ when you run with 3 processes. For example, the diagram for simplefork with 
+ two processes would be (assuming the process id of the parent is 414 and the
+ process id of the child is 416)
+ say 0 is the main process
+ 0->1(with i = 1)
+ 0->2(with i = 2)
+ 0->3(with i = 3 : can not fork more process)
+ 1->4(with i = 2)
+ 1->5(with 1 = 3 : can not fork more process)
+ 2->6(with 1 = 3 : can not fork more process)
+ 4->7(with 1 = 3 : can not fork more process)

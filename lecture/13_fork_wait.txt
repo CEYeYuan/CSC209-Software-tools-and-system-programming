@@ -1,0 +1,17 @@
+int ret = fork();
+//ret == 0			in the child process
+//ret < 0			if fork fails
+//return > 0 		parent process gets the children's pid
+
+wait(&status)
+//wait for one of the children to terminate
+//status lowest 8 bits: if receive a signal
+//status next 8 bits: 	the exited value
+WIFEXITED(stat_val)
+Evaluates to a non-zero value if status was returned for a child process that terminated normally.
+WEXITSTATUS(stat_val)
+If the value of WIFEXITED(stat_val) is non-zero, this macro evaluates to the low-order 8 bits of the status argument that the child process passed to _exit() or exit(), or the value the child process returned from main().
+	
+//diffirent between return and exit
+	return only terminates the current function
+	exit terminates the entire process
