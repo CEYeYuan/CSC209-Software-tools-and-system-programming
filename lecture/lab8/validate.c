@@ -10,7 +10,8 @@
 and password pair from a password file. The first chunk (10 bytes)
 will contain a user id, and the second chunk (10 bytes) will contain a password.
 The program exits with a value of 0 if the user id and password match, 
-1 if there is an error, 2 if the user id is found but the password does not match, and 3 if the user id is not found in the password file. */
+1 if there is an error, 2 if the user id is found but the password does not match,
+ and 3 if the user id is not found in the password file. */
 
 int main(void){
     int n, user_length;
