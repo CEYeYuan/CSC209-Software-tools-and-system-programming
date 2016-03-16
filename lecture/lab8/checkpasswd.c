@@ -28,7 +28,10 @@ int main(void) {
 
     /*Your code here*/
     int fd[2] ;
-    pipe(fd);
+    if (pipe(fd) != 0){
+    	perror("Error");
+    	//should not happen
+    }
     int ret = fork();
     if(ret == 0){
     	//child process, would run validate
