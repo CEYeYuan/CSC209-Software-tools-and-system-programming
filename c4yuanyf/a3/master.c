@@ -4,12 +4,14 @@
 #include <unistd.h>
 #include <getopt.h>
 
-int create_map_workers(int num);
-int create_reduce_workers(int num);
+int create_map_workers(int** fd, int start,int end);
+int create_reduce_workers(int** fd, int start,int end);
 void safe_close(int num);
 void safe_dup2(int p,int q);
 int safe_read(int fd, void *buf, int count);
 int safe_fork();
+void safe_pipe(int *fd);
+
 
 
 int main(int argc,char** argv){
@@ -45,22 +47,23 @@ int main(int argc,char** argv){
 	if (pipe(fd[0]) == -1){
 		fprintf(stderr, "Error creating pipe");
 	}
+	printf("running ls %s\n",dir);
 	int ret = safe_fork();
 	if(ret == 0){
 		//child process, close reading pipe
 		safe_close(fd[0][0]);
 		safe_dup2(fd[0][1],STDOUT_FILENO);
 		safe_close(fd[0][1]);
-		execlp("ls",dir,NULL);
+		execl("/bin/ls","ls","texts/",NULL);
 		perror("exec");
 	}else{
 		//parent process, read from the pipe
 		safe_close(fd[0][1]);
+		safe_dup2(fd[0][0],STDIN_FILENO);
+		safe_close(fd[0][0]);
 		char *file_name = malloc(sizeof(char)*MAX_FILENAME);
-		while(safe_read(fd[0][0],file_name,MAX_FILENAME) != 0){
-			fprintf(stdout, "%s",file_name);
-			free(file_name);
-			file_name = malloc(sizeof(char)*MAX_FILENAME);	
+		while(scanf("%s",file_name) > 0){
+			fprintf(stdout, "%s\n",file_name);
 		}
 	}
 
@@ -81,7 +84,7 @@ int main(int argc,char** argv){
 void safe_close(int fd){
 	int ret = close(fd);
 	if(ret == -1){
-		printf("Error closing pipe\n");
+		perror("close");
 		exit(-1);
 	}
 }
@@ -110,4 +113,12 @@ int safe_fork(){
 		exit(-1);
 	}
 	return ret;
+}
+
+void safe_pipe(int *fd){
+	int ret = pipe(fd);
+	if(ret == -1){
+		perror("pipe");
+		exit(-1);
+	}
 }
