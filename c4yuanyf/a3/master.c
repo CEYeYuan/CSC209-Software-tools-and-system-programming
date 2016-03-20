@@ -42,14 +42,9 @@ int main(int argc,char** argv){
 
 	int fd[1][2];//fd for ls process
 	int map_fd[map_worker*2][2];//fd for the map worker
-	int reduce_fd[reduce_worker*2][2];
+	int reduce_fd[reduce_worker][2];
 
-	if (create_map_workers(map_fd,map_worker) != map_worker){
-		//should never happen
-		fprintf(stderr, "Error in creating map worker\n");
-		return -1;
-	}
-
+	
 	safe_pipe(fd[0]);
 	int ret = safe_fork();
 	if(ret == 0){
@@ -61,27 +56,56 @@ int main(int argc,char** argv){
 		perror("exec");
 	}else{
 		//parent process, read from the pipe
+		//set up the pipe for the ls process
 		safe_close(fd[0][1]);
 		safe_dup2(fd[0][0], STDIN_FILENO);
 		safe_close(fd[0][0]);
+
+		if (create_map_workers(map_fd,map_worker) != map_worker){
+			//should never happen
+			fprintf(stderr, "Error in creating map worker\n");
+			return -1;
+		}
+
 		int count = 0;
 		char *file_name = malloc(sizeof(char)*MAX_FILENAME);
 		while(scanf("%s",file_name) > 0){
 			int index = count % map_worker;
-			fprintf(stdout, "%s to worker %d \n", file_name, index);
-			safe_write(map_fd[index*2][1],file_name, 30);
-			//safe_write(map_fd[index*2][1], "dumb", 5);
+			char *full_name  = malloc(sizeof(char)*MAX_FILENAME);
+			strcat(full_name,dir);
+			if(dir[strlen(dir)-1] != '/')
+				strcat(full_name,"/");
+			strcat(full_name,file_name);
+			fprintf(stdout, "%s to worker %d \n", full_name, index);
+			safe_write(map_fd[index*2][1],full_name, MAX_FILENAME);
 			count++;
+		}
+		int i ;
+		//make sure before we create reduce workers, all the pipes 
+		//to map workers are properly closed
+		for(i = 0; i < map_worker; i++){
+			//no longer need these write pipes
+			safe_close(map_fd[2*i][1]);
+		}
+
+		Pair pair;
+		if (create_reduce_workers(reduce_fd,reduce_worker) != reduce_worker){
+			//should never happen
+			fprintf(stderr, "Error in creating reduce worker\n");
+			return -1;
+		}
+
+		for(i = 0; i < map_worker; i++){
+			while(safe_read(map_fd[2*i+1][0], &pair, sizeof(pair)) > 0){
+				printf("%s %s\n",pair.key,pair.value);
+			}
+
+			//done reading from that child
+			safe_close(map_fd[2*i+1][0]);
 		}
 	}
 
 
-
-	// if (create_reduce_workers(reduce_worker) != reduce_worker){
-	// 	//should never happen
-	// 	fprintf(stderr, "Error in creating reduce worker\n");
-	// 	return -1;
-	// }
 	printf("%d %d\n",reduce_worker,reduce_fd[0][1]);
 	return 0;
 	
@@ -106,8 +130,8 @@ int create_map_workers(int fd[][2],int num){
 			safe_close(fd[2*i][1]);
 			safe_close(fd[2*i+1][0]);
 
-			safe_dup2(fd[2*i][0],STDIN_FILENO);//redirect stdout
-			safe_dup2(fd[2*i+1][1],STDOUT_FILENO);//redirect stdin
+			safe_dup2(fd[2*i][0],STDIN_FILENO);//redirect in
+			safe_dup2(fd[2*i+1][1],STDOUT_FILENO);//redirect stdout
 
 			safe_close(fd[2*i][0]);
 			safe_close(fd[2*i+1][1]);
@@ -123,3 +147,28 @@ int create_map_workers(int fd[][2],int num){
 	return num;
 }
 
+int create_reduce_workers(int fd[][2],int num){
+	int i;
+	for(i = 0;i < num;i++){
+		//the pipe is used for sending data to a reduce worker
+		safe_pipe(fd[i]);
+		int ret = safe_fork();
+		if(ret == 0){
+			int j;
+			for(j=0; j<i; j++){
+				//close the pipe with the previous reduce workers
+				safe_close(fd[j][1]);
+			}
+			//child process
+			safe_close(fd[i][1]);
+			safe_dup2(fd[i][0],STDIN_FILENO);//redirect stdin
+			safe_close(fd[i][1]);
+			execl("/bin/ls", "ls", NULL);
+
+		}else{
+			//parent process
+			safe_close(fd[i][0]);
+		}
+	}
+	return num;
+}

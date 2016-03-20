@@ -55,3 +55,20 @@ void safe_pipe(int *fd){
 	}
 }
 
+FILE* safe_fopen(char *path,char *mode){
+	FILE* p = fopen(path,mode);
+	if(p == NULL){
+		perror("fopen");
+		exit(-1);
+	}
+		
+	return p;
+}
+
+void safe_fclose(FILE * file){
+	int ret = fclose(file);
+	if(ret == -1){
+		perror("fclose");
+		exit(-1);
+	}
+}
