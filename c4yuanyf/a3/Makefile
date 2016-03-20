@@ -1,5 +1,8 @@
 CFLAGS=-std=c99 -Wall -Werror
-all: mapreduce 
+all: mapreduce mapworker
 
-mapreduce: master.c
+mapreduce: master.c safe.c safe.h
+	gcc ${CFLAGS} -o $@ $^
+
+mapworker: mapworker.c safe.c safe.h
 	gcc ${CFLAGS} -o $@ $^

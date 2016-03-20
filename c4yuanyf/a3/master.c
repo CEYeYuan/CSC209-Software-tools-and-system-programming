@@ -3,14 +3,11 @@
 #include "mapreduce.h"
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
+#include "safe.h"
 
-int create_map_workers(int** fd, int start,int end);
-int create_reduce_workers(int** fd, int start,int end);
-void safe_close(int num);
-void safe_dup2(int p,int q);
-int safe_read(int fd, void *buf, int count);
-int safe_fork();
-void safe_pipe(int *fd);
+int create_map_workers(int fd[][2], int num);
+int create_reduce_workers(int fd[][2], int num);
 
 
 
@@ -43,82 +40,86 @@ int main(int argc,char** argv){
 		return -1;
 	}
 
-	int fd[1+map_worker+reduce_worker][2];
-	if (pipe(fd[0]) == -1){
-		fprintf(stderr, "Error creating pipe");
+	int fd[1][2];//fd for ls process
+	int map_fd[map_worker*2][2];//fd for the map worker
+	int reduce_fd[reduce_worker*2][2];
+
+	if (create_map_workers(map_fd,map_worker) != map_worker){
+		//should never happen
+		fprintf(stderr, "Error in creating map worker\n");
+		return -1;
 	}
-	printf("running ls %s\n",dir);
+
+	safe_pipe(fd[0]);
 	int ret = safe_fork();
 	if(ret == 0){
 		//child process, close reading pipe
 		safe_close(fd[0][0]);
 		safe_dup2(fd[0][1],STDOUT_FILENO);
 		safe_close(fd[0][1]);
-		execl("/bin/ls","ls","texts/",NULL);
+		execl("/bin/ls","ls",dir,NULL);
 		perror("exec");
 	}else{
 		//parent process, read from the pipe
 		safe_close(fd[0][1]);
-		safe_dup2(fd[0][0],STDIN_FILENO);
+		safe_dup2(fd[0][0], STDIN_FILENO);
 		safe_close(fd[0][0]);
+		int count = 0;
 		char *file_name = malloc(sizeof(char)*MAX_FILENAME);
 		while(scanf("%s",file_name) > 0){
-			fprintf(stdout, "%s\n",file_name);
+			int index = count % map_worker;
+			fprintf(stdout, "%s to worker %d \n", file_name, index);
+			safe_write(map_fd[index*2][1],file_name, 30);
+			//safe_write(map_fd[index*2][1], "dumb", 5);
+			count++;
 		}
 	}
 
 
-	// if (create_map_workers(map_worker) != map_worker){
-	// 	//should never happen
-	// 	fprintf(stderr, "Error in creating map worker\n");
-	// 	return -1;
-	// }
+
 	// if (create_reduce_workers(reduce_worker) != reduce_worker){
 	// 	//should never happen
 	// 	fprintf(stderr, "Error in creating reduce worker\n");
 	// 	return -1;
 	// }
+	printf("%d %d\n",reduce_worker,reduce_fd[0][1]);
+	return 0;
 	
 }
 
-void safe_close(int fd){
-	int ret = close(fd);
-	if(ret == -1){
-		perror("close");
-		exit(-1);
+int create_map_workers(int fd[][2],int num){
+	int i;
+	for(i = 0;i < num;i++){
+		//the first pipe is used for sending data to map worker
+		//the second pipe is used for receiving data from map worker
+		safe_pipe(fd[2*i]);
+		safe_pipe(fd[2*i+1]);
+		int ret = safe_fork();
+		if(ret == 0){
+			int j;
+			for(j=0; j<i; j++){
+				//close the pipe with the previous map workers
+				safe_close(fd[2*j][1]);
+				safe_close(fd[2*j+1][0]);	
+			}
+			//child process
+			safe_close(fd[2*i][1]);
+			safe_close(fd[2*i+1][0]);
+
+			safe_dup2(fd[2*i][0],STDIN_FILENO);//redirect stdout
+			safe_dup2(fd[2*i+1][1],STDOUT_FILENO);//redirect stdin
+
+			safe_close(fd[2*i][0]);
+			safe_close(fd[2*i+1][1]);
+
+			execl("./mapworker", "mapworker", NULL);
+
+		}else{
+			//parent process
+			safe_close(fd[2*i][0]);
+			safe_close(fd[2*i+1][1]);
+		}
 	}
+	return num;
 }
 
-void safe_dup2(int p, int q){
-	int ret = dup2(p,q);
-	if(ret == -1){
-		perror("dup2");
-		exit(-1);
-	}
-}
-
-int safe_read(int fd, void *buf, int count){
-	int ret = read(fd,buf,count);
-	if(ret == -1){
-		perror("read");
-		exit(-1);
-	}
-	return ret;
-}
-
-int safe_fork(){
-	int ret = fork();
-	if(ret == -1){
-		perror("fork");
-		exit(-1);
-	}
-	return ret;
-}
-
-void safe_pipe(int *fd){
-	int ret = pipe(fd);
-	if(ret == -1){
-		perror("pipe");
-		exit(-1);
-	}
-}
