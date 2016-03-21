@@ -78,7 +78,7 @@ int main(int argc,char** argv){
 			if(dir[strlen(dir)-1] != '/')
 				strcat(full_name,"/");
 			strcat(full_name,file_name);
-			fprintf(stdout, "%s to worker %d \n", full_name, index);
+			//fprintf(stdout, "%s to worker %d \n", full_name, index);
 			safe_write(map_fd[index*2][1],full_name, MAX_FILENAME);
 			count++;
 		}
@@ -108,14 +108,19 @@ int main(int argc,char** argv){
 			//done reading from that child
 			safe_close(map_fd[2*i+1][0]);
 		}
+
+		for(i = 0; i < reduce_worker; i++){
+			//close the pipe to the reduce worker
+			safe_close(reduce_fd[i][1]);
+		}
 	}
 	
-	// int i;
-	// for(i = 0; i < map_worker + reduce_worker; i++){
-	// 	int status;
-	// 	wait(&status);
-	// }	
-	// printf("mapworker=%d reduce worker= %d\n",map_worker,reduce_worker );
+	printf("wait %d process to complete \n",map_worker+reduce_worker);
+	int i;
+	for(i = 0; i < map_worker + reduce_worker; i++){
+		int status;
+		wait(&status);
+	}	
 	return 0;
 	
 }

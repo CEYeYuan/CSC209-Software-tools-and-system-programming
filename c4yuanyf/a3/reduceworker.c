@@ -18,13 +18,8 @@ int main(){
 	sprintf(name, "%d.out", pid);
 	FILE *fp = safe_fopen(name,"w");
 	while(head != NULL){
-		int sum = 0;
-		LLValues *v_list = head->head_value;
-		while(v_list != NULL){
-			sum += atoi(v_list -> value);
-			v_list = v_list->next;
-		}
-		fprintf(fp, "%s %d \n",head->key,sum );
+		pair = reduce(head->key, head->head_value);
+		fprintf(fp, "%s %s \n",head->key,pair.value);
 		head = head->next;
 	}		
 	safe_fclose(fp);
