@@ -70,18 +70,20 @@ int main(int argc,char** argv){
 		}
 
 		int count = 0;
-		char *file_name = malloc(sizeof(char)*MAX_FILENAME);
+		char *file_name = safe_malloc(sizeof(char)*MAX_FILENAME);
 		while(scanf("%s",file_name) > 0){
 			int index = count % map_worker;
-			char *full_name  = malloc(sizeof(char)*MAX_FILENAME);
+			char *full_name  = safe_malloc(sizeof(char)*MAX_FILENAME);
 			strcat(full_name,dir);
 			if(dir[strlen(dir)-1] != '/')
 				strcat(full_name,"/");
 			strcat(full_name,file_name);
 			//fprintf(stdout, "%s to worker %d \n", full_name, index);
 			safe_write(map_fd[index*2][1],full_name, MAX_FILENAME);
+			free(full_name);
 			count++;
 		}
+		free(file_name);
 		int i ;
 		//make sure before we create reduce workers, all the pipes 
 		//to map workers are properly closed

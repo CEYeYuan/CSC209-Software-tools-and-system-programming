@@ -10,4 +10,8 @@ int safe_fork();
 void safe_pipe(int *fd);
 FILE* safe_fopen(char *path,char *mode);
 void safe_fclose(FILE * file);
+void safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream);
+void* safe_malloc(int num);
+
+
 #endif

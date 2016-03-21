@@ -18,8 +18,8 @@ int main(){
 	FILE *fp = safe_fopen(name,"wb");
 	while(head != NULL){
 		pair = reduce(head->key, head->head_value);
-		fwrite(head->key, strlen(head->key)+1, 1, fp);
-		fwrite(pair.value, strlen(pair.value)+1, 1, fp);
+		safe_fwrite(head->key, strlen(head->key)+1, 1, fp);
+		safe_fwrite(pair.value, strlen(pair.value)+1, 1, fp);
 		head = head->next;
 	}		
 	safe_fclose(fp);

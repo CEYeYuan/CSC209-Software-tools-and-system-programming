@@ -72,3 +72,20 @@ void safe_fclose(FILE * file){
 		exit(-1);
 	}
 }
+
+void safe_fwrite(void *ptr, int size, int nitems, FILE *stream){
+	int ret = fwrite(ptr, size, nitems, stream);
+	if(ret <= 0){
+		perror("fwrite");
+		exit(-1);
+	}
+}
+
+void* safe_malloc(int num){
+	void *ptr = malloc(num);
+	if(num != 0 && ptr == NULL){
+		perror("malloc");
+		exit(-1);
+	}
+	return ptr;
+}
