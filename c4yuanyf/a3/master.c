@@ -5,6 +5,8 @@
 #include <getopt.h>
 #include <string.h>
 #include "safe.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 int create_map_workers(int fd[][2], int num);
 int create_reduce_workers(int fd[][2], int num);
@@ -88,6 +90,7 @@ int main(int argc,char** argv){
 			safe_close(map_fd[2*i][1]);
 		}
 
+	
 		Pair pair;
 		if (create_reduce_workers(reduce_fd,reduce_worker) != reduce_worker){
 			//should never happen
@@ -97,16 +100,22 @@ int main(int argc,char** argv){
 
 		for(i = 0; i < map_worker; i++){
 			while(safe_read(map_fd[2*i+1][0], &pair, sizeof(pair)) > 0){
-				printf("%s %s\n",pair.key,pair.value);
+				char c = pair.key[0];
+				int index = c % reduce_worker;
+				//printf("%s %s to child %d \n",pair.key,pair.value,index);
+				safe_write(reduce_fd[index][1],&pair, sizeof(pair));
 			}
-
 			//done reading from that child
 			safe_close(map_fd[2*i+1][0]);
 		}
 	}
-
-
-	printf("%d %d\n",reduce_worker,reduce_fd[0][1]);
+	
+	int i;
+	for(i = 0; i < map_worker + reduce_worker; i++){
+		int status;
+		wait(&status);
+	}	
+	printf("mapworker=%d reduce worker= %d\n",map_worker,reduce_worker );
 	return 0;
 	
 }
@@ -162,8 +171,8 @@ int create_reduce_workers(int fd[][2],int num){
 			//child process
 			safe_close(fd[i][1]);
 			safe_dup2(fd[i][0],STDIN_FILENO);//redirect stdin
-			safe_close(fd[i][1]);
-			execl("/bin/ls", "ls", NULL);
+			safe_close(fd[i][0]);
+			execl("./reduceworker", "reduceworker", NULL);
 
 		}else{
 			//parent process
