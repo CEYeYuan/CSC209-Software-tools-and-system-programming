@@ -7,5 +7,5 @@ mapreduce: master.c safe.c safe.h
 mapworker: mapworker.c safe.c safe.h mapreduce.h word_freq.c
 	gcc ${CFLAGS} -o $@ $^
 
-reduceworker: reduceworker.c safe.c safe.h mapreduce.h word_freq.c
+reduceworker: reduceworker.c safe.c safe.h mapreduce.h word_freq.c linkedlist.h linkedlist.c
 	gcc ${CFLAGS} -o $@ $^

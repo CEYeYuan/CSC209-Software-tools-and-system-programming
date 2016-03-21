@@ -110,12 +110,12 @@ int main(int argc,char** argv){
 		}
 	}
 	
-	int i;
-	for(i = 0; i < map_worker + reduce_worker; i++){
-		int status;
-		wait(&status);
-	}	
-	printf("mapworker=%d reduce worker= %d\n",map_worker,reduce_worker );
+	// int i;
+	// for(i = 0; i < map_worker + reduce_worker; i++){
+	// 	int status;
+	// 	wait(&status);
+	// }	
+	// printf("mapworker=%d reduce worker= %d\n",map_worker,reduce_worker );
 	return 0;
 	
 }
