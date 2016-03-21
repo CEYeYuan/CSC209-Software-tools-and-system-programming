@@ -7,10 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 
-
-Pair*  map1(const char *chunk, int outfd) {
-	Pair *ret = malloc(READSIZE*sizeof(Pair));
-	int count = 0;
+void  map1(const char *chunk, LLKeyValues **head) {
     Pair pair = {"", "1"};
     int index = 0;
     const char *cptr = chunk;
@@ -29,9 +26,7 @@ Pair*  map1(const char *chunk, int outfd) {
             } else {
                 pair.key[index] = '\0';
                // write(outfd, &pair, sizeof(Pair));
-                strcpy(ret[count].key,pair.key);
-                strcpy(ret[count].value,pair.value);
-                count++;
+              	insert_into_keys(head,pair);
                 while (isspace(*cptr)) {
                     cptr++;
                 }
@@ -52,11 +47,8 @@ Pair*  map1(const char *chunk, int outfd) {
     pair.key[index] = '\0';
     if (index > 0) {
         //write(outfd, &pair, sizeof(Pair));
-         strcpy(ret[count].key,pair.key);
-         strcpy(ret[count].value,pair.value);
-         count++;
+        insert_into_keys(head,pair);
     }
-    return ret;
 }
 
 
@@ -68,25 +60,21 @@ int main(){
 	p[3] ="texts/1ws4111.txt";
 	int i = 0;
 	LLKeyValues *head = NULL;
-	for(i = 0; i < 3;i++){
+	for(i = 0; i < 4;i++){
 		FILE *file = safe_fopen(p[i],"r");
 		char *chunk = malloc(sizeof(char)*READSIZE);
 		while(fread(chunk,READSIZE-1,1,file) > 0){
 			chunk[READSIZE-1] = '\0';
-			Pair *p = map1(chunk,STDIN_FILENO);
-			while(p != NULL && p->key != NULL){
-				//fprintf(stderr,"child processing %s\n",pair.key);
-					insert_into_keys(&head, *p);
-					p +=1; 
-			}
+			map1(chunk,&head);
 		}
 		safe_fclose(file);
 	}
 	
-	FILE *fp = safe_fopen("reference","w");
+	FILE *fp = safe_fopen("reference","wb");
 	while(head != NULL){
 		Pair pair = reduce(head->key, head->head_value);
-		fprintf(fp, "%s %s \n",head->key,pair.value);
+		fwrite(head->key, strlen(head->key)+1, 1, fp);
+		fwrite(pair.value, strlen(pair.value)+1, 1, fp);
 		head = head->next;
 	}		
 	safe_fclose(fp);
