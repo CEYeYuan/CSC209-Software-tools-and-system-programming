@@ -67,16 +67,19 @@ int main(){
 			chunk[READSIZE-1] = '\0';
 			map1(chunk,&head);
 		}
+		free(chunk);
 		safe_fclose(file);
 	}
 	
 	FILE *fp = safe_fopen("reference","wb");
-	while(head != NULL){
-		Pair pair = reduce(head->key, head->head_value);
-		safe_fwrite(head->key, strlen(head->key)+1, 1, fp);
+	LLKeyValues *cur = head;
+	while(cur != NULL){
+		Pair pair = reduce(cur->key, cur->head_value);
+		safe_fwrite(cur->key, strlen(cur->key)+1, 1, fp);
 		safe_fwrite(pair.value, strlen(pair.value)+1, 1, fp);
-		head = head->next;
-	}		
+		cur = cur->next;
+	}	
+	free_key_values_list(head);	
 	safe_fclose(fp);
 	return 0;
 }

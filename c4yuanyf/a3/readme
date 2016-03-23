@@ -1,0 +1,9 @@
+files:
+masters.c   mapworker.c reduceworker.c are the important files for 
+this assigment
+
+safe.h and safe.c includes all the wrapped system call function
+
+benchmark.c is just a program use map/reduce function locally.The 
+only usage of this program is to compare the local result to the 
+output using pipes. It will generte a file called reference.
