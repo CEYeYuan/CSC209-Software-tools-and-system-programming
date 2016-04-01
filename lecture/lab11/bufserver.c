@@ -52,7 +52,13 @@ int setup(void) {
 
 int find_network_newline(const char *buf, int inbuf) {
   // Step 1: write this function
-
+  int i ;
+  for(i = 0; i <= inbuf-2; i++){
+    if(buf[i] != '\r')
+        continue;
+    if(buf[i+1] == '\n')
+        return i;
+  }
   return -1; // return the location of '\r' if found
 }
 
@@ -87,10 +93,10 @@ int main() {
 
       while ((nbytes = read(fd, after, room)) > 0) {
         // Step 2: update inbuf (how many bytes were just added?)
+        inbuf += nbytes;
 
-        
         // Step 3: call find_network_newline, store result in variable "where"
-
+        where = find_network_newline(buf, inbuf);
         
         if (where >= 0) { // OK. we have a full line
 
@@ -100,7 +106,8 @@ int main() {
           // otherwise you'll get junk in the output.
           // (Replace the "\r\n" with appropriate characters so the 
           // message prints correctly to stdout.)
-          
+          buf[where] = '\n';
+          buf[where+1] = '\0';
           
           printf("Next message: %s", buf);
           // Note that we could have also used write to avoid having to
@@ -109,16 +116,18 @@ int main() {
           
           // Step 5: update inbuf and remove the full line from the buffer
           // There might be stuff after the line, so don't just do inbuf = 0
+          inbuf -= where+2;
+          buf[where] = '\0';
           
           // You want to move the stuff after the full line to the beginning 
           // of the buffer.  A loop can do it, or you can use memmove.
           // memmove(destination, source, number_of_bytes)
-        
-
+          memmove(buf, buf+where+2, inbuf);
             
         }
         // Step 6: update room and after, in preparation for the next read
-
+         room = sizeof(buf) - inbuf;
+         after = inbuf + buf;
 
        
       }
