@@ -105,8 +105,8 @@ char* list_users(const User *curr) {
         curr = curr->next;
     }
     *(head) = '\0';//end of the string
-    //printf("Composed :\n"); 
-    //printf("%s",ret);
+    printf("Composed :\n"); 
+    printf("%s",ret);
     return ret;
 }
 
@@ -170,20 +170,33 @@ int make_friends(const char *name1, const char *name2, User *head) {
  *  Print a post.
  *  Use localtime to print the time and date.
  */
-int print_post(const Post *post) {
+char* print_post(const Post *post) {
     if (post == NULL) {
-        return 1;
+        return NULL;
     }
+    int len = 0;
     // Print author
-    printf("From: %s\n", post->author);
-    
+    //printf("From: %s\n", post->author);
+    len += strlen(post->author) + 6 + 1;// 6 for "From: ", 1 for "\n"
     // Print date
-    printf("Date: %s\n", asctime(localtime(post->date)));
-
+    //printf("Date: %s\n", asctime(localtime(post->date)));
+    len += strlen(asctime(localtime(post->date))) + 6 + 1;
+    //6 for "Date: ", 1 for "\n"
     // Print message
-    printf("%s\n", post->contents);
+    //printf("%s\n", post->contents);
+    len += strlen(post->contents) + 1 + 1;
+    // 1 for "\n", additonal one for the null terminator
+    char *ret = malloc(sizeof(char) * len);
+    char *head = ret;
+    head += snprintf(head, strlen(post->author) + 6 +2, "From: %s\n", post->author);
+    head += snprintf(head, strlen(asctime(localtime(post->date)))+6+2, 
+        "Date: %s\n", asctime(localtime(post->date)));
+    head += snprintf(head, strlen(post->contents)+2, "%s\n", post->contents);
+    *head = '\0';
+   // printf("Composed: \n");
+    //printf("%s", ret);
 
-    return 0;
+    return ret;
 }
 
 
@@ -195,35 +208,72 @@ int print_post(const Post *post) {
  *   - 0 on success.
  *   - 1 if the user is NULL.
  */
-int print_user(const User *user) {
+char* print_user(const User *user) {
     if (user == NULL) {
-        return 1;
+        return NULL;
     }
     char *line_breaker = "------------------------------------------\n";
+    int len = 0 ;
     // Print name
-    printf("Name: %s\n\n", user->name);
-    printf("------------------------------------------\n");
+    //printf("Name: %s\n\n", user->name);
+    len += strlen(user->name) + 2 + 6;//2 for "\n\n", 6 for "Name: "
+    //printf("------------------------------------------\n");
+    len += strlen(line_breaker);
 
     // Print friend list.
-    printf("Friends:\n");
+    //printf("Friends:\n");
+    len += strlen("Friends:\n");
     for (int i = 0; i < MAX_FRIENDS && user->friends[i] != NULL; i++) {
-        printf("%s\n", user->friends[i]->name);
+        //printf("%s\n", user->friends[i]->name);
+        len += strlen(user->friends[i]->name) + 1;
     }
-    printf("------------------------------------------\n");
+    //printf("------------------------------------------\n");
+    len += strlen(line_breaker);
 
     // Print post list.
-    printf("Posts:\n");
+    //printf("Posts:\n");
+    len += strlen("Posts:\n");
     const Post *curr = user->first_post;
     while (curr != NULL) {
-        print_post(curr);
+        char *post = print_post(curr);
+        //printf("%s", post);
+        len += strlen(post);
+        free(post); //prevent memory leak
         curr = curr->next;
         if (curr != NULL) {
-            printf("\n===\n\n");
+            //printf("\n===\n\n");
+            len += strlen("\n===\n\n");
         }
     }
-    printf("------------------------------------------\n");
-
-    return 0;
+    //printf("------------------------------------------\n");
+    len += strlen(line_breaker) + 1;// for the null terminator
+    //now compose the final string 
+    char *ret = malloc(sizeof(char) * len);
+    char *head = ret;
+    head += snprintf(head, strlen(user->name) + 2 + 6 +1, "Name: %s\n\n", user->name);
+    head += snprintf(head, strlen(line_breaker) + 1, "%s", line_breaker);
+    head += snprintf(head, strlen("Friends:\n") + 1, "Friends:\n");
+    for (int i = 0; i < MAX_FRIENDS && user->friends[i] != NULL; i++) {
+        head += snprintf(head, strlen(user->friends[i]->name) + 2, "%s\n", user->friends[i]->name);
+    }
+    head += snprintf(head, strlen(line_breaker) + 1, "%s", line_breaker);
+    head += snprintf(head, strlen("Posts:\n") + 1, "Posts:\n");
+    curr = user->first_post;
+    while (curr != NULL) {
+        char *post = print_post(curr);
+        head += snprintf(head, strlen(post) + 1, "%s", post);
+        free(post); //prevent memory leak
+        curr = curr->next;
+        if (curr != NULL) {
+            head += snprintf(head, strlen("\n===\n\n") + 1,"\n===\n\n");
+        }
+    }
+    head += snprintf(head, strlen(line_breaker) + 1, "%s", line_breaker);
+    *head = '\0';
+    //printf("Composed: \n");
+    //printf("%s", ret);
+    //printf("%s\n","end" );
+    return ret;
 }
 
 
