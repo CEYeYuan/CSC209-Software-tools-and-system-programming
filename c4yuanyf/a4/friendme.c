@@ -17,46 +17,58 @@ void error(char *msg) {
     fprintf(stderr, "Error: %s\n", msg);
 }
 
+void safe_write(int fd, const void *buf, int count){
+  int ret = write(fd, buf, count);
+  if(ret == -1){
+    perror("write:");
+    exit(-1);
+  }
+}
+
 /* 
  * Read and process commands
  * Return:  -1 for quit command
  *          0 otherwise
  */
-int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name) {
+int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name, int fd) {
     User *user_list = *user_list_ptr;
+    char *response = NULL;
+    int len = 0;
 
     if (cmd_argc <= 0) {
         return 0;
     } else if (strcmp(cmd_argv[0], "quit") == 0 && cmd_argc == 1) {
         return -1;
-    } else if (strcmp(cmd_argv[0], "add_user") == 0 && cmd_argc == 2) {
-        switch (create_user(cmd_argv[1], user_list_ptr)) {
-            case 1:
-                error("user by this name already exists");
-                break;
-            case 2:
-                error("username is too long");
-                break;
-        }
-
-    } else if (strcmp(cmd_argv[0], "list_users") == 0 && cmd_argc == 1) {
+    }  else if (strcmp(cmd_argv[0], "list_users") == 0 && cmd_argc == 1) {
         char * buf =list_users(user_list);
-        printf("%s",buf);
+        safe_write(fd, buf, strlen(buf)+1);
         free(buf);
 
     } else if (strcmp(cmd_argv[0], "make_friends") == 0 && cmd_argc == 2) {
         switch (make_friends(cmd_argv[1], name, user_list)) {
+            case 0:
+                 len = strlen("You are now friends with ") + strlen(cmd_argv[1]) + 3;
+                 // 3 for "\r\n" and null terminator
+                 response = malloc(sizeof(char) * len);
+                 snprintf(response, len, "You are now friends with %s\r\n", cmd_argv[1]);
+                 safe_write(fd, response, strlen(response)+1);
+                 free(response);
+                 break;
             case 1:
-                error("users are already friends");
+                response = "users are already friends\r\n";
+                safe_write(fd, response, strlen(response)+1);
                 break;
             case 2:
-                error("at least one user you entered has the max number of friends");
+                response = "at least one user you entered has the max number of friends\r\n";
+                safe_write(fd, response, strlen(response)+1);
                 break;
             case 3:
-                error("you must enter two different users");
+                //should never happen
+                //error("you must enter two different users");
                 break;
             case 4:
-                error("at least one user you entered does not exist");
+                response = "the user you entered does not exist\r\n";
+                safe_write(fd, response, strlen(response)+1);
                 break;
         }
     } else if (strcmp(cmd_argv[0], "post") == 0 && cmd_argc >= 3) {
@@ -74,7 +86,7 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
         }
 
         // copy in the bits to make a single string
-        strcpy(contents, cmd_argv[3]);
+        strcpy(contents, cmd_argv[2]);
         for (int i = 4; i < cmd_argc; i++) {
             strcat(contents, " ");
             strcat(contents, cmd_argv[i]);
@@ -84,23 +96,27 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
         User *target = find_user(cmd_argv[1], user_list);
         switch (make_post(author, target, contents)) {
             case 1:
-                error("the users are not friends");
+                response = "You can only post to your friends\r\n";
+                safe_write(fd, response, strlen(response)+1);
                 break;
             case 2:
-                error("at least one user you entered does not exist");
+                response = "the user you entered does not exist\r\n";
+                safe_write(fd, response, strlen(response)+1);
                 break;
         }
     } else if (strcmp(cmd_argv[0], "profile") == 0 && cmd_argc == 2) {
         User *user = find_user(cmd_argv[1], user_list);
         if (print_user(user) == NULL) {
-            error("user not found");
+            response = "user not found\r\n";
+            safe_write(fd, response, strlen(response)+1);
         }else{
             char *buf = print_user(user);
-            printf("%s", buf);
+            safe_write(fd, buf, strlen(buf)+1);
             free(buf);
         }
     } else {
-        error("Incorrect syntax");
+        response = "Incorrect syntax\r\n";
+        safe_write(fd, response, strlen(response)+1);
     }
     return 0;
 }
@@ -218,7 +234,6 @@ int main(int argc, char* argv[]) {
     socklen_t socklen;
 
     listenfd = setup();
-    printf("Welcome to FriendMe! \n");
     while (1) {
         socklen = sizeof(peer);
         // Note that we're passing in valid pointers for the second and third
@@ -228,11 +243,10 @@ int main(int argc, char* argv[]) {
           perror("accept");
 
         } else {
-          printf("New connection on port %d\n", ntohs(peer.sin_port));
-          printf("What is your user name?\n");
+          safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
           // Receive messages
           inbuf = 0;          // buffer is empty; has no bytes
-          room = sizeof(buf); // room == capacity of the whole buffer
+          room = sizeof(buf); // room == capacity of the whole buffer  printf("> ");
           after = buf;        // start writing at beginning of buf
           int is_inited = 0;      // the first cmd from the user would be the name 
           //bind that name with the fd number 
@@ -271,27 +285,33 @@ int main(int argc, char* argv[]) {
                     strncpy(name, cmd_argv[0], 31);
                     name[31] = '\0';
                     is_inited = 1;
+                    char *response = NULL;
                     switch (create_user(name, &user_list)) {
                         case 1:
-                            error("Welcome back.\nGo ahead and enter user commands>");
+                            response = "Welcome back.\r\nGo ahead and enter user commands>\r\n" ;
+                            safe_write(fd, response, strlen(response) + 1);
+                            safe_write(fd, "> ", strlen("> ") + 1);
                             break;
                         case 2:
-                            error("Username too long, truncated to 31 chars.\nGo ahead and enter user commands>");
+                            response = "Username too long, truncated to 31 chars.\r\nGo ahead and enter user commands>\r\n" ;
+                            safe_write(fd, response, strlen(response) + 1);
+                            safe_write(fd, "> ", strlen("> ") + 1);
                             break;
                         case 0:
-                            error("Welcome.\nGo ahead and enter user commands>");
-                                break;
+                            response = "Welcome.\r\nGo ahead and enter user commands>\r\n" ;
+                            safe_write(fd, response, strlen(response) + 1);
+                            safe_write(fd, "> ", strlen("> ") + 1);
+                            break;
                     }
 
                 }
                 else{
-                    if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name) == -1) {
+                    if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name, fd) == -1) {
                         break; // can only reach if quit command was entered
                     }
+                    safe_write(fd, "> ", strlen("> ") + 1);
                 }
                
-
-                printf("> ");
               /*********************************/
               
               
@@ -327,7 +347,7 @@ int main(int argc, char* argv[]) {
         char *cmd_argv[INPUT_ARG_MAX_NUM];
         int cmd_argc = tokenize(input, cmd_argv);
 
-        if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name) == -1) {
+        if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name, fd) == -1) {
             break; // can only reach if quit command was entered
         }
 
