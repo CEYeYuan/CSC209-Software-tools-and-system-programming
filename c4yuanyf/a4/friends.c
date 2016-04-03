@@ -88,28 +88,27 @@ char* list_users(const User *curr) {
     printf("User List\n");
     char *ret = NULL;
     int len = 0; //the len of the final string
-    User *tmp = curr;
+    User *tmp = (User *)curr;
     while (tmp != NULL) {
         len += strlen(tmp->name)+2;
         //to keep the same format, 2 more char is used for leading '\t' and 
         //trailing '\n'. Also, null terminator for each string is removed 
-        //since we only need to add one at the end of the string
+        //=1since we only need to add one at the end of the string
         tmp = tmp->next;
     }
     char *p = "User List\n";
     len += 1 + strlen(p);//1 for the null terminator
     ret = malloc(sizeof(char) * len);
     char *head = ret;
-    head += snprintf(head, strlen(p),p);
-    
-
+    head += snprintf(head, strlen(p)+1, "%s", p);//overwrite the NULL terminator
     while (curr != NULL) {
-        printf("%s\n", curr->name );
-        head += snprintf(head, strlen(curr->name)+2, "\n\t%s",curr->name);
+        printf("\t%s\n", curr->name);
+        head += snprintf(head, strlen(curr->name)+1+2, "\t%s\n",curr->name);
         curr = curr->next;
     }
-   // *head = '\0';//end of the string
-    printf("Composed : %s   %d",ret,len);
+    *(head+1) = '\0';//end of the string
+    printf("Composed :\n"); 
+    printf("%s",ret);
     return ret;
 }
 
