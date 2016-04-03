@@ -22,7 +22,7 @@ void error(char *msg) {
  * Return:  -1 for quit command
  *          0 otherwise
  */
-int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
+int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name) {
     User *user_list = *user_list_ptr;
 
     if (cmd_argc <= 0) {
@@ -44,8 +44,8 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
         printf("%s",buf);
         free(buf);
 
-    } else if (strcmp(cmd_argv[0], "make_friends") == 0 && cmd_argc == 3) {
-        switch (make_friends(cmd_argv[1], cmd_argv[2], user_list)) {
+    } else if (strcmp(cmd_argv[0], "make_friends") == 0 && cmd_argc == 2) {
+        switch (make_friends(cmd_argv[1], name, user_list)) {
             case 1:
                 error("users are already friends");
                 break;
@@ -59,10 +59,10 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
                 error("at least one user you entered does not exist");
                 break;
         }
-    } else if (strcmp(cmd_argv[0], "post") == 0 && cmd_argc >= 4) {
+    } else if (strcmp(cmd_argv[0], "post") == 0 && cmd_argc >= 3) {
         // first determine how long a string we need
         int space_needed = 0;
-        for (int i = 3; i < cmd_argc; i++) {
+        for (int i = 2; i < cmd_argc; i++) {
             space_needed += strlen(cmd_argv[i]) + 1;
         }
 
@@ -80,8 +80,8 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
             strcat(contents, cmd_argv[i]);
         }
 
-        User *author = find_user(cmd_argv[1], user_list);
-        User *target = find_user(cmd_argv[2], user_list);
+        User *author = find_user(name, user_list);
+        User *target = find_user(cmd_argv[1], user_list);
         switch (make_post(author, target, contents)) {
             case 1:
                 error("the users are not friends");
@@ -100,8 +100,7 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
             free(buf);
         }
     } else {
-        strncpy(name, 31,cmd_argv[0]);
-        name[31] = '\0';
+        error("Incorrect syntax");
     }
     return 0;
 }
@@ -235,6 +234,9 @@ int main(int argc, char* argv[]) {
           inbuf = 0;          // buffer is empty; has no bytes
           room = sizeof(buf); // room == capacity of the whole buffer
           after = buf;        // start writing at beginning of buf
+          int is_inited = 0;      // the first cmd from the user would be the name 
+          //bind that name with the fd number 
+
 
           while ((nbytes = read(fd, after, room)) > 0) {
             // Step 2: update inbuf (how many bytes were just added?)
@@ -264,10 +266,30 @@ int main(int argc, char* argv[]) {
 
                 char *cmd_argv[INPUT_ARG_MAX_NUM];
                 int cmd_argc = tokenize(buf, cmd_argv);
+                if(is_inited == 0){
+                    //haven't created yet
+                    strncpy(name, cmd_argv[0], 31);
+                    name[31] = '\0';
+                    is_inited = 1;
+                    switch (create_user(name, &user_list)) {
+                        case 1:
+                            error("Welcome back.\nGo ahead and enter user commands>");
+                            break;
+                        case 2:
+                            error("Username too long, truncated to 31 chars.\nGo ahead and enter user commands>");
+                            break;
+                        case 0:
+                            error("Welcome.\nGo ahead and enter user commands>");
+                                break;
+                    }
 
-                if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list) == -1) {
-                    break; // can only reach if quit command was entered
                 }
+                else{
+                    if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name) == -1) {
+                        break; // can only reach if quit command was entered
+                    }
+                }
+               
 
                 printf("> ");
               /*********************************/
@@ -305,7 +327,7 @@ int main(int argc, char* argv[]) {
         char *cmd_argv[INPUT_ARG_MAX_NUM];
         int cmd_argc = tokenize(input, cmd_argv);
 
-        if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list) == -1) {
+        if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name) == -1) {
             break; // can only reach if quit command was entered
         }
 

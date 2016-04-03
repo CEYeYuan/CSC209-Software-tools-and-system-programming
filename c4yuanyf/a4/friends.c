@@ -43,8 +43,8 @@ int create_user(const char *name, User **user_ptr_add) {
         prev = curr;
         curr = curr->next;
     }
-
-    if (prev == NULL) {
+    //BUG FIXED
+    if (*user_ptr_add == NULL) {
         *user_ptr_add = new_user;
         return 0;
     } else if (curr != NULL) {
