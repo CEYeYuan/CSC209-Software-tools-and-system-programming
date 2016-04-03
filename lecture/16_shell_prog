@@ -1,0 +1,59 @@
+1. almost everything is treated as texts
+2. space matters
+3. when need a data-structure, use python
+
+hash ban (shban in the first line)
+#!/bin/sh
+variable names : CAPS
+dereference : use $     $NAME
+NAME=YE			#name space around '='
+~ or $HOME	: home directory
+$NAME will try to interpret NAME as a program:
+	$NAME=date
+	$name   will run date 
+
+for file in 1 2 3 			#file is a variable
+do
+echo $file
+done
+>>1
+>>2
+>>3
+
+for file in "1 2 3"			#file is a variable
+do
+echo $file
+done
+>>1 2 3
+
+VAR="1 2 3"
+for file in $VAR		#when dereference, we lose ""
+do
+echo $file			
+done
+>>1
+>>2
+>>3
+
+VAR="1 2 3"
+for file in "$VAR"		#when dereference, we lose ""
+do
+echo $file			
+done
+>>1 2 3
+
+
+test: a command to test if a file exists
+test -d filename : exixts as directory
+-f: as file 
+-r: readalbe
+-w: writeable
+-x: executable
+-z: empty string
+= : string equality
+-eq : int equality
+
+[] means test
+if[ ! -d notes]		#if not exist notes dir : space is mandetory
+
+/dev/null 		redirect some garbage

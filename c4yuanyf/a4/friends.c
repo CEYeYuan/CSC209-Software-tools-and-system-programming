@@ -85,7 +85,6 @@ User *find_user(const char *name, const User *head) {
  * Names should be printed to standard output, one per line.
  */
 char* list_users(const User *curr) {
-    printf("User List\n");
     char *ret = NULL;
     int len = 0; //the len of the final string
     User *tmp = (User *)curr;
@@ -102,13 +101,12 @@ char* list_users(const User *curr) {
     char *head = ret;
     head += snprintf(head, strlen(p)+1, "%s", p);//overwrite the NULL terminator
     while (curr != NULL) {
-        printf("\t%s\n", curr->name);
         head += snprintf(head, strlen(curr->name)+1+2, "\t%s\n",curr->name);
         curr = curr->next;
     }
-    *(head+1) = '\0';//end of the string
-    printf("Composed :\n"); 
-    printf("%s",ret);
+    *(head) = '\0';//end of the string
+    //printf("Composed :\n"); 
+    //printf("%s",ret);
     return ret;
 }
 
@@ -201,7 +199,7 @@ int print_user(const User *user) {
     if (user == NULL) {
         return 1;
     }
-
+    char *line_breaker = "------------------------------------------\n";
     // Print name
     printf("Name: %s\n\n", user->name);
     printf("------------------------------------------\n");
