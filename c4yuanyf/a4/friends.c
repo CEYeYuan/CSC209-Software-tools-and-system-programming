@@ -105,8 +105,8 @@ char* list_users(const User *curr) {
         curr = curr->next;
     }
     *(head) = '\0';//end of the string
-    printf("Composed :\n"); 
-    printf("%s",ret);
+    //printf("Composed :\n"); 
+    //printf("%s",ret);
     return ret;
 }
 

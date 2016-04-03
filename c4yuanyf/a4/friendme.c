@@ -38,7 +38,9 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
         }
 
     } else if (strcmp(cmd_argv[0], "list_users") == 0 && cmd_argc == 1) {
-        list_users(user_list);
+        char * buf =list_users(user_list);
+        printf("%s",buf);
+        free(buf);
 
     } else if (strcmp(cmd_argv[0], "make_friends") == 0 && cmd_argc == 3) {
         switch (make_friends(cmd_argv[1], cmd_argv[2], user_list)) {
@@ -88,8 +90,12 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
         }
     } else if (strcmp(cmd_argv[0], "profile") == 0 && cmd_argc == 2) {
         User *user = find_user(cmd_argv[1], user_list);
-        if (print_user(user) == 1) {
+        if (print_user(user) == NULL) {
             error("user not found");
+        }else{
+            char *buf = print_user(user);
+            printf("%s", buf);
+            free(buf);
         }
     } else {
         error("Incorrect syntax");
@@ -118,7 +124,63 @@ int tokenize(char *cmd, char **cmd_argv) {
 
     return cmd_argc;
 }
+/*******************************************************/
+//code from lab 11
+int setup(void) {
+  int on = 1, status;
+  struct sockaddr_in self;
+  int listenfd;
+  if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+    perror("socket");
+    exit(1);
+  }
 
+  // Make sure we can reuse the port immediately after the
+  // server terminates.
+  status = setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR,
+                      (const char *) &on, sizeof(on));
+  if(status == -1) {
+    perror("setsockopt -- REUSEADDR");
+  }
+
+  self.sin_family = AF_INET;
+  self.sin_addr.s_addr = INADDR_ANY;
+  self.sin_port = htons(PORT);
+  memset(&self.sin_zero, 0, sizeof(self.sin_zero));  // Initialize sin_zero to 0
+
+  printf("Listening on %d\n", PORT);
+
+  if (bind(listenfd, (struct sockaddr *)&self, sizeof(self)) == -1) {
+    perror("bind"); // probably means port is in use
+    exit(1);
+  }
+
+  if (listen(listenfd, 5) == -1) {
+    perror("listen");
+    exit(1);
+  }
+  return listenfd;
+}
+
+/*Search the first inbuf characters of buf for a network newline ("\r\n").
+  Return the location of the '\r' if the network newline is found,
+  or -1 otherwise.
+  Definitely do not use strchr or any other string function in here. (Why not?)
+*/
+
+int find_network_newline(const char *buf, int inbuf) {
+  // Step 1: write this function
+  int i ;
+  for(i = 0; i <= inbuf-2; i++){
+    if(buf[i] != '\r')
+        continue;
+    if(buf[i+1] == '\n')
+        return i;
+  }
+  return -1; // return the location of '\r' if found
+}
+/***********************************************************/
+//code end from lab11
 
 int main(int argc, char* argv[]) {
     int batch_mode = (argc == 2);
@@ -138,6 +200,22 @@ int main(int argc, char* argv[]) {
         // interactive mode 
         input_stream = stdin;
     }
+
+    /**********************************************************/
+    //code from lab11
+    int listenfd;
+    int fd, nbytes;
+    char buf[100];
+    int inbuf; // how many bytes currently in buffer?
+    int room; // how much room left in buffer?
+    char *after; // pointer to position after the (valid) data in buf
+    int where; // location of network newline
+
+    struct sockaddr_in peer;
+    socklen_t socklen;
+
+    listenfd = setup();
+  /******************************************************/
 
     printf("Welcome to FriendMe! (Local version)\nPlease type a command:\n> ");
     

@@ -1,5 +1,8 @@
 #include <time.h>
 
+#ifndef PORT
+	#define PORT 54247
+#endif
 #define MAX_NAME 32     // Max username and profile_pic filename lengths
 #define MAX_FRIENDS 10  // Max number of friends a user can have
 
