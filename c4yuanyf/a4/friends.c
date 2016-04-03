@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <assert.h>
 
 /*
  * Create a new user with the given name.  Insert it at the tail of the list 
@@ -56,6 +56,55 @@ int create_user(const char *name, User **user_ptr_add) {
     }
 }
 
+/*
+*   given an fd, return the corresponding user  
+*/
+User *find_name_by_fd(int fd, User *head){
+    while (head != NULL && fd != head->fd) {
+        head = head->next;
+    }
+    return head;
+}
+
+/*
+*   given an user list, build the corresponding fdset
+*/
+void build_fdset(fd_set &set, User *head){
+     FD_ZERO(set);
+      while (head != NULL && head->fd > 0) {
+         FD_SET(head->fd, set);
+         head = head->next;
+      }
+}
+
+/*
+* after a user disconnected, since that fd may be used for newly connected user,
+* the bind between the fd and old user should be removed
+*/
+void unset(int fd, User *head){
+    User *p = find_name_by_fd(fd, head);
+    // since we only call unset on quit function, at that time, there must be one 
+    //user using that fd
+    assert(p != NULL);
+    p->fd = -1;
+
+}
+
+/*
+*   before we call select, we need to find the max fd in 
+*/
+int find_max_fd(User *head){
+    int max = 0;
+    while (head != NULL) {
+        if(head->fd > max)
+            max = head->fd;
+        head = head->next;
+    }
+    return max;
+}
+
+
+
 
 /* 
  * Return a pointer to the user with this name in
@@ -65,13 +114,7 @@ int create_user(const char *name, User **user_ptr_add) {
  * to satisfy the prototype without warnings.
  */
 User *find_user(const char *name, const User *head) {
-/*    const User *curr = head;
-    while (curr != NULL && strcmp(name, curr->name) != 0) {
-        curr = curr->next;
-    }
 
-    return (User *)curr;
-*/
     while (head != NULL && strcmp(name, head->name) != 0) {
         head = head->next;
     }

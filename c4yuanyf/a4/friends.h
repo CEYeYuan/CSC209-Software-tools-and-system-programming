@@ -11,6 +11,7 @@ typedef struct user {
     struct post *first_post;
     struct user *friends[MAX_FRIENDS];
     struct user *next;
+    int fd;
 } User;
 
 typedef struct post {
@@ -20,6 +21,29 @@ typedef struct post {
     struct post *next;
 } Post;
 
+
+
+/*
+*   given an fd, return the corresponding user name or vice versa
+*/
+User *find_name_by_fd(int fd, User *user_ptr);
+User *find_fd_by_name(char *name, User *user_ptr);
+
+/*
+*   given an user list, build the corresponding fdset
+*/
+void build_fdset(fd_set &set, User *user_ptr);
+
+/*
+* after a user disconnected, since that fd may be used for newly connected user,
+* the bind between the fd and old user should be removed
+*/
+void unset(int fd);
+
+/*
+*   before we call select, we need to find the max fd in 
+*/
+int find_max_fd(User *user_ptr);
 
 /*
  * Create a new user with the given name.  Insert it at the tail of the list

@@ -202,23 +202,8 @@ int find_network_newline(const char *buf, int inbuf) {
 
 int main(int argc, char* argv[]) {
     char name[32];
-    int batch_mode = (argc == 2);
-    char input[INPUT_BUFFER_SIZE];
-    FILE *input_stream;
-
     // Create the heads of the empty data structure
     User *user_list = NULL;
-
-    if (batch_mode) {
-        input_stream = fopen(argv[1], "r");
-        if (input_stream == NULL) {
-            perror("Error opening file");
-            exit(1);
-        }
-    } else {
-        // interactive mode 
-        input_stream = stdin;
-    }
 
     /**********************************************************/
     //code from lab11
@@ -243,6 +228,7 @@ int main(int argc, char* argv[]) {
           perror("accept");
 
         } else {
+            
           safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
           // Receive messages
           inbuf = 0;          // buffer is empty; has no bytes
@@ -274,10 +260,6 @@ int main(int argc, char* argv[]) {
               // Note that we could have also used write to avoid having to
               // put the '\0' in the buffer. Try using write later!
               /********************************/
-              if (batch_mode) {
-                printf("%s", input);
-              }
-
                 char *cmd_argv[INPUT_ARG_MAX_NUM];
                 int cmd_argc = tokenize(buf, cmd_argv);
                 if(is_inited == 0){
@@ -335,28 +317,6 @@ int main(int argc, char* argv[]) {
   }
   /******************************************************/
 
- 
-    
-    while (fgets(input, INPUT_BUFFER_SIZE, input_stream) != NULL) {
-        // only echo the line in batch mode since in interactive mode the user
-        // just typed the line
-        if (batch_mode) {
-            printf("%s", input);
-        }
-
-        char *cmd_argv[INPUT_ARG_MAX_NUM];
-        int cmd_argc = tokenize(input, cmd_argv);
-
-        if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name, fd) == -1) {
-            break; // can only reach if quit command was entered
-        }
-
-        printf("> ");
-    }
-
-    if (batch_mode) {
-        fclose(input_stream);
-    }
 
     return 0;
  }
