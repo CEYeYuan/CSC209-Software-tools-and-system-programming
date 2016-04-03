@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,7 +100,8 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr) {
             free(buf);
         }
     } else {
-        error("Incorrect syntax");
+        strncpy(name, 31,cmd_argv[0]);
+        name[31] = '\0';
     }
     return 0;
 }
@@ -183,6 +186,7 @@ int find_network_newline(const char *buf, int inbuf) {
 //code end from lab11
 
 int main(int argc, char* argv[]) {
+    char name[32];
     int batch_mode = (argc == 2);
     char input[INPUT_BUFFER_SIZE];
     FILE *input_stream;
@@ -215,9 +219,81 @@ int main(int argc, char* argv[]) {
     socklen_t socklen;
 
     listenfd = setup();
+    printf("Welcome to FriendMe! \n");
+    while (1) {
+        socklen = sizeof(peer);
+        // Note that we're passing in valid pointers for the second and third
+        // arguments to accept here, so we can actually store and use client
+        // information.
+        if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
+          perror("accept");
+
+        } else {
+          printf("New connection on port %d\n", ntohs(peer.sin_port));
+          printf("What is your user name?\n");
+          // Receive messages
+          inbuf = 0;          // buffer is empty; has no bytes
+          room = sizeof(buf); // room == capacity of the whole buffer
+          after = buf;        // start writing at beginning of buf
+
+          while ((nbytes = read(fd, after, room)) > 0) {
+            // Step 2: update inbuf (how many bytes were just added?)
+            inbuf += nbytes;
+
+            // Step 3: call find_network_newline, store result in variable "where"
+            where = find_network_newline(buf, inbuf);
+            
+            if (where >= 0) { // OK. we have a full line
+
+              // Step 4: output the full line, not including the "\r\n",
+              // using print statement below.
+              // Be sure to put a '\0' in the correct place first;
+              // otherwise you'll get junk in the output.
+              // (Replace the "\r\n" with appropriate characters so the 
+              // message prints correctly to stdout.)
+              buf[where] = '\n';
+              buf[where+1] = '\0';
+              
+              //printf("processing command: %s", buf);
+              // Note that we could have also used write to avoid having to
+              // put the '\0' in the buffer. Try using write later!
+              /********************************/
+              if (batch_mode) {
+                printf("%s", input);
+              }
+
+                char *cmd_argv[INPUT_ARG_MAX_NUM];
+                int cmd_argc = tokenize(buf, cmd_argv);
+
+                if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list) == -1) {
+                    break; // can only reach if quit command was entered
+                }
+
+                printf("> ");
+              /*********************************/
+              
+              
+              // Step 5: update inbuf and remove the full line from the buffer
+              // There might be stuff after the line, so don't just do inbuf = 0
+              inbuf -= where+2;
+              buf[where] = '\0';
+              
+              // You want to move the stuff after the full line to the beginning 
+              // of the buffer.  A loop can do it, or you can use memmove.
+              // memmove(destination, source, number_of_bytes)
+              memmove(buf, buf+where+2, inbuf);
+                
+            }
+            // Step 6: update room and after, in preparation for the next read
+             room = sizeof(buf) - inbuf;
+             after = inbuf + buf;
+          }
+          close(fd);
+    }
+  }
   /******************************************************/
 
-    printf("Welcome to FriendMe! (Local version)\nPlease type a command:\n> ");
+ 
     
     while (fgets(input, INPUT_BUFFER_SIZE, input_stream) != NULL) {
         // only echo the line in batch mode since in interactive mode the user
