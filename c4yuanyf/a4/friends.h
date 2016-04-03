@@ -1,6 +1,13 @@
 #ifndef PORT
 	#define PORT 54247
 #endif
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/select.h>
+#include <stdio.h>
 #include <time.h>
 #define MAX_NAME 32     // Max username and profile_pic filename lengths
 #define MAX_FRIENDS 10  // Max number of friends a user can have
@@ -32,13 +39,13 @@ User *find_fd_by_name(char *name, User *user_ptr);
 /*
 *   given an user list, build the corresponding fdset
 */
-void build_fdset(fd_set &set, User *user_ptr);
+void build_fdset(fd_set *set, User *user_ptr);
 
 /*
 * after a user disconnected, since that fd may be used for newly connected user,
 * the bind between the fd and old user should be removed
 */
-void unset(int fd);
+void unset(int fd, User *head);
 
 /*
 *   before we call select, we need to find the max fd in 

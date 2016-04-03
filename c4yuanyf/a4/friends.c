@@ -69,7 +69,7 @@ User *find_name_by_fd(int fd, User *head){
 /*
 *   given an user list, build the corresponding fdset
 */
-void build_fdset(fd_set &set, User *head){
+void build_fdset(fd_set *set, User *head){
      FD_ZERO(set);
       while (head != NULL && head->fd > 0) {
          FD_SET(head->fd, set);
