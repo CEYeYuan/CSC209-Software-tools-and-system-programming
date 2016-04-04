@@ -59,11 +59,15 @@ int create_user(const char *name, User **user_ptr_add) {
 /*
 *  when there is new user connected in, we want to added it into the fd-name list 
 */
+
 void add_fd(int fd, List** head){
     if (*head == NULL){
         //the list has not been initialized
         *head = malloc(sizeof(List));
         (*head)->fd = fd;
+        (*head)->inbuf = 0;
+        (*head)->room = sizeof((*head)->buf);
+        (*head)->after = (*head)->buf;
         return;
     }else{
         // if there is invalid node (user connect and then disconnect), we can 
@@ -71,6 +75,9 @@ void add_fd(int fd, List** head){
         List *node = find_by_fd(-1, *head);
         if(node != NULL){
             node->fd = fd;
+            node->inbuf = 0;
+            node->room = sizeof((*head)->buf);
+            node->after = (*head)->buf;
             return;
         }else{
             List *cur = *head;
@@ -79,6 +86,9 @@ void add_fd(int fd, List** head){
             }
             cur->next = malloc(sizeof(List));
             (cur->next)->fd = fd;
+            (cur->next)->inbuf = 0;
+            (cur->next)->room = sizeof((*head)->buf);
+            (cur->next)->after = (*head)->buf;
             return;
         }
 
@@ -130,6 +140,9 @@ void invalid(int fd, List *head){
     //user using that fd
     assert(p != NULL);
     p->fd = -1;
+    p->inbuf = 0;
+    p->room = sizeof((p)->buf);
+    p->after = p->buf;
     p->inited = 0;
     free(p->name);
 }

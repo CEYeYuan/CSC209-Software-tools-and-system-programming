@@ -32,6 +32,11 @@ typedef struct list{
     char *name;
     int inited;
     struct list *next;
+    char buf[100];
+    int inbuf; // how many bytes currently in buffer?
+    int room; // how much room left in buffer?
+    char *after; // pointer to position after the (valid) data in buf
+    int where; // location of network newline
 } List;
 
 /*

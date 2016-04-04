@@ -209,118 +209,116 @@ int main(int argc, char* argv[]) {
     //code from lab11
     int listenfd;
     int fd, nbytes;
-    char buf[100];
-    int inbuf; // how many bytes currently in buffer?
-    int room; // how much room left in buffer?
-    char *after; // pointer to position after the (valid) data in buf
-    int where; // location of network newline
+    
 
     struct sockaddr_in peer;
     socklen_t socklen;
     List *head = NULL;// the list-map for the fd and name
     listenfd = setup();
+    add_fd(listenfd, &head);
     while (1) {
-        socklen = sizeof(peer);
-        // Note that we're passing in valid pointers for the second and third
-        // arguments to accept here, so we can actually store and use client
-        // information.
-        if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
-          perror("accept");
-
-        } 
-        else {        
-          safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
-        }
+      /* CONNECTION SETUP
         
+      */
+        fd_set set;
+        build_fdset(&set, head);
+        int numfd = find_max_fd(head) + 1;
+         //select always remove fd from the set, never add more in
+        if (select(numfd, &set, NULL, NULL, NULL) == -1) {
+            perror("select");
+            exit(1);
+        }
 
+        // If there is data from listen_fd, accept it
 
-          // Receive messages
-          inbuf = 0;          // buffer is empty; has no bytes
-          room = sizeof(buf); // room == capacity of the whole buffer  printf("> ");
-          after = buf;        // start writing at beginning of buf
-          int is_inited = 0;      // the first cmd from the user would be the name 
-          //bind that name with the fd number 
-
-
-          while ((nbytes = read(fd, after, room)) > 0) {
-            // Step 2: update inbuf (how many bytes were just added?)
-            inbuf += nbytes;
-
-            // Step 3: call find_network_newline, store result in variable "where"
-            where = find_network_newline(buf, inbuf);
-            
-            if (where >= 0) { // OK. we have a full line
-
-              // Step 4: output the full line, not including the "\r\n",
-              // using print statement below.
-              // Be sure to put a '\0' in the correct place first;
-              // otherwise you'll get junk in the output.
-              // (Replace the "\r\n" with appropriate characters so the 
-              // message prints correctly to stdout.)
-              buf[where] = '\n';
-              buf[where+1] = '\0';
-              
-              //printf("processing command: %s", buf);
-              // Note that we could have also used write to avoid having to
-              // put the '\0' in the buffer. Try using write later!
-              /********************************/
-                char *cmd_argv[INPUT_ARG_MAX_NUM];
-                int cmd_argc = tokenize(buf, cmd_argv);
-                if(is_inited == 0){
-                    //haven't created yet
-                    strncpy(name, cmd_argv[0], 31);
-                    name[31] = '\0';
-                    is_inited = 1;
-                    char *response = NULL;
-                    switch (create_user(name, &user_list)) {
-                        case 1:
-                            response = "Welcome back.\r\nGo ahead and enter user commands>\r\n" ;
-                            safe_write(fd, response, strlen(response) + 1);
-                            safe_write(fd, "> ", strlen("> ") + 1);
-                            break;
-                        case 2:
-                            response = "Username too long, truncated to 31 chars.\r\nGo ahead and enter user commands>\r\n" ;
-                            safe_write(fd, response, strlen(response) + 1);
-                            safe_write(fd, "> ", strlen("> ") + 1);
-                            break;
-                        case 0:
-                            response = "Welcome.\r\nGo ahead and enter user commands>\r\n" ;
-                            safe_write(fd, response, strlen(response) + 1);
-                            safe_write(fd, "> ", strlen("> ") + 1);
-                            break;
-                    }
-
-                }
-                else{
-                    if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, name, fd) == -1) {
-                        break; // can only reach if quit command was entered
-                    }
-                    safe_write(fd, "> ", strlen("> ") + 1);
-                }
-               
-              /*********************************/
-              
-              
-              // Step 5: update inbuf and remove the full line from the buffer
-              // There might be stuff after the line, so don't just do inbuf = 0
-              inbuf -= where+2;
-              buf[where] = '\0';
-              
-              // You want to move the stuff after the full line to the beginning 
-              // of the buffer.  A loop can do it, or you can use memmove.
-              // memmove(destination, source, number_of_bytes)
-              memmove(buf, buf+where+2, inbuf);
-                
+        if (FD_ISSET(listenfd, &set)) {
+            socklen = sizeof(peer);
+            // Note that we're passing in valid pointers for the second and third
+            // arguments to accept here, so we can actually store and use client
+            // information.
+            if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
+                perror("accept");
+                add_fd(fd, &head);//add it to the map structure
+            } 
+            else {        
+              safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
             }
-            // Step 6: update room and after, in preparation for the next read
-             room = sizeof(buf) - inbuf;
-             after = inbuf + buf;
-          }
-          close(fd);
-    
+        }
+
+        List *cur = head;
+        while (cur != NULL && cur->fd > 0){
+            if (FD_ISSET(cur->fd, &set)) {
+                if ((nbytes = read(cur->fd, cur->buf, cur->room)) < 0) {
+                    perror("read");
+                } 
+                else if (nbytes == 0) {
+                    //if read returns 0, we know that users is disconnected
+                    invalid(cur->fd,head);
+                    printf("user is closed\n");
+                    close(fd);
+                }
+                else {
+                    // Receive messages
+                    // Step 2: update inbuf (how many bytes were just added?)
+                    cur->inbuf += nbytes;
+                    // Step 3: call find_network_newline, store result in variable "where"
+                    cur->where = find_network_newline(cur->buf, cur->inbuf);
+            
+                    if (cur->where >= 0) { // OK. we have a full line
+                        cur->buf[cur->where] = '\n';
+                        cur->buf[cur->where+1] = '\0';
+                        char *cmd_argv[INPUT_ARG_MAX_NUM];
+                        int cmd_argc = tokenize(cur->buf, cmd_argv);
+                        if(cur->inited == 0){
+                            //haven't created yet
+                            strncpy(name, cmd_argv[0], 31);
+                            name[31] = '\0';
+                            set_name(cur->fd, head, name);
+                            char *response = NULL;
+                            switch (create_user(name, &user_list)) {
+                                case 1:
+                                    response = "Welcome back.\r\nGo ahead and enter user commands>\r\n" ;
+                                    safe_write(cur->fd, response, strlen(response) + 1);
+                                    safe_write(cur->fd, "> ", strlen("> ") + 1);
+                                    break;
+                                case 2:
+                                    response = "Username too long, truncated to 31 chars.\r\nGo ahead and enter user commands>\r\n" ;
+                                    safe_write(cur->fd, response, strlen(response) + 1);
+                                    safe_write(cur->fd, "> ", strlen("> ") + 1);
+                                    break;
+                                case 0:
+                                    response = "Welcome.\r\nGo ahead and enter user commands>\r\n" ;
+                                    safe_write(cur->fd, response, strlen(response) + 1);
+                                    safe_write(cur->fd, "> ", strlen("> ") + 1);
+                                    break;
+                            }
+
+                        }
+                        else{
+                            if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd) == -1) {
+                                invalid(cur->fd,head);
+                                printf("user is closed\n");
+                                close(fd); // can only reach if quit command was entered
+                            }
+                            safe_write(cur->fd, "> ", strlen("> ") + 1);
+                        }
+                     
+                        // Step 5: update inbuf and remove the full line from the buffer
+                        cur->inbuf -= cur->where+2;
+                        cur->buf[cur->where] = '\0';
+                        
+                        // You want to move the stuff after the full line to the beginning 
+                        // of the buffer.  
+                        memmove(cur->buf, (cur->buf)+cur->where+2, cur->inbuf);
+                    
+                    }
+                    // Step 6: update room and after, in preparation for the next read
+                    cur->room = sizeof(cur->buf) - cur->inbuf;
+                    cur->after = cur->inbuf + cur->buf;      
+                }
+           }
+           cur = cur->next;
+        }
   }
-  /******************************************************/
-
-
     return 0;
- }
+  }
