@@ -221,6 +221,7 @@ int main(int argc, char* argv[]) {
         
       */
         fd_set set;
+
         build_fdset(&set, head);
         int numfd = find_max_fd(head) + 1;
          //select always remove fd from the set, never add more in
@@ -238,16 +239,16 @@ int main(int argc, char* argv[]) {
             // information.
             if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
                 perror("accept");
-                add_fd(fd, &head);//add it to the map structure
             } 
             else {        
+              add_fd(fd, &head);//add it to the map structure
               safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
             }
         }
 
         List *cur = head;
         while (cur != NULL && cur->fd > 0){
-            if (FD_ISSET(cur->fd, &set)) {
+            if (FD_ISSET(cur->fd, &set) && cur->fd != listenfd) {
                 if ((nbytes = read(cur->fd, cur->buf, cur->room)) < 0) {
                     perror("read");
                 } 
@@ -268,7 +269,9 @@ int main(int argc, char* argv[]) {
                         cur->buf[cur->where] = '\n';
                         cur->buf[cur->where+1] = '\0';
                         char *cmd_argv[INPUT_ARG_MAX_NUM];
+                        printf("buf %s\n",cur->buf );
                         int cmd_argc = tokenize(cur->buf, cmd_argv);
+                        printf("%d\n", cmd_argc);
                         if(cur->inited == 0){
                             //haven't created yet
                             strncpy(name, cmd_argv[0], 31);
@@ -297,7 +300,7 @@ int main(int argc, char* argv[]) {
                         else{
                             if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd) == -1) {
                                 invalid(cur->fd,head);
-                                printf("user is closed\n");
+                                printf("bye\n");
                                 close(fd); // can only reach if quit command was entered
                             }
                             safe_write(cur->fd, "> ", strlen("> ") + 1);
