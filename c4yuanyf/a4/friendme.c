@@ -217,7 +217,7 @@ int main(int argc, char* argv[]) {
 
     struct sockaddr_in peer;
     socklen_t socklen;
-
+    List *head = NULL;// the list-map for the fd and name
     listenfd = setup();
     while (1) {
         socklen = sizeof(peer);
@@ -227,9 +227,13 @@ int main(int argc, char* argv[]) {
         if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
           perror("accept");
 
-        } else {
-            
+        } 
+        else {        
           safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
+        }
+        
+
+
           // Receive messages
           inbuf = 0;          // buffer is empty; has no bytes
           room = sizeof(buf); // room == capacity of the whole buffer  printf("> ");
@@ -313,7 +317,7 @@ int main(int argc, char* argv[]) {
              after = inbuf + buf;
           }
           close(fd);
-    }
+    
   }
   /******************************************************/
 
