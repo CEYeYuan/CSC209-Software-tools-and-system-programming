@@ -96,6 +96,19 @@ List* find_by_fd(int fd,  List* head){
 }
 
 /*
+*   given an fd, set the name in that node
+*/
+void set_name(int fd, List *head, char *name){
+    List *node = find_by_fd(fd, head);
+    assert(node != NULL);
+    assert(node->inited == 0);
+    node->inited = 1;
+    node->name = malloc(sizeof(char) * (strlen(name) + 1));
+    strcpy(node->name, name);
+    return;
+}
+
+/*
 *   given an user list, build the corresponding fdset
 */
 void build_fdset(fd_set *set,  List* head){
@@ -117,7 +130,8 @@ void invalid(int fd, List *head){
     //user using that fd
     assert(p != NULL);
     p->fd = -1;
-
+    p->inited = 0;
+    free(p->name);
 }
 
 /*

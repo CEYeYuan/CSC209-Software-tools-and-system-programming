@@ -30,6 +30,7 @@ typedef struct post {
 typedef struct list{
     int fd;
     char *name;
+    int inited;
     struct list *next;
 } List;
 
@@ -42,6 +43,11 @@ List* find_by_fd(int fd, List* head);
 *  when there is new user connected in, we want to added it into the fd-name list 
 */
 void add_fd(int fd, List** head);
+
+/*
+*   given an fd, set the name in that node
+*/
+void set_name(int fd, List *head, char* name);
 
 /*
 *   given an user list, build the corresponding fdset
