@@ -57,9 +57,38 @@ int create_user(const char *name, User **user_ptr_add) {
 }
 
 /*
+*  when there is new user connected in, we want to added it into the fd-name list 
+*/
+void add_fd(int fd, List** head){
+    if (*head == NULL){
+        //the list has not been initialized
+        *head = malloc(sizeof(List));
+        (*head)->fd = fd;
+        return;
+    }else{
+        // if there is invalid node (user connect and then disconnect), we can 
+        //make use of that node; if not, just add the node to the end of the list
+        List *node = find_by_fd(-1, *head);
+        if(node != NULL){
+            node->fd = fd;
+            return;
+        }else{
+            List *cur = *head;
+            while( cur->next != NULL){
+                cur = cur->next;
+            }
+            cur->next = malloc(sizeof(List));
+            (cur->next)->fd = fd;
+            return;
+        }
+
+    }
+}
+
+/*
 *   given an fd, return the corresponding user  
 */
-User *find_name_by_fd(int fd, User *head){
+List* find_by_fd(int fd,  List* head){
     while (head != NULL && fd != head->fd) {
         head = head->next;
     }
@@ -69,7 +98,7 @@ User *find_name_by_fd(int fd, User *head){
 /*
 *   given an user list, build the corresponding fdset
 */
-void build_fdset(fd_set *set, User *head){
+void build_fdset(fd_set *set,  List* head){
      FD_ZERO(set);
       while (head != NULL && head->fd > 0) {
          FD_SET(head->fd, set);
@@ -80,9 +109,10 @@ void build_fdset(fd_set *set, User *head){
 /*
 * after a user disconnected, since that fd may be used for newly connected user,
 * the bind between the fd and old user should be removed
+* when we invalid a fd, we just find that node, and set it's value to -1
 */
-void unset(int fd, User *head){
-    User *p = find_name_by_fd(fd, head);
+void invalid(int fd, List *head){
+    List *p = find_by_fd(fd, head);
     // since we only call unset on quit function, at that time, there must be one 
     //user using that fd
     assert(p != NULL);
@@ -93,7 +123,7 @@ void unset(int fd, User *head){
 /*
 *   before we call select, we need to find the max fd in 
 */
-int find_max_fd(User *head){
+int find_max_fd(List *head){
     int max = 0;
     while (head != NULL) {
         if(head->fd > max)
