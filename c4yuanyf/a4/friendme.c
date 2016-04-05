@@ -7,7 +7,7 @@
 
 #define INPUT_BUFFER_SIZE 256
 #define INPUT_ARG_MAX_NUM 12
-#define DELIM " \n"
+#define DELIM " "
 
 
 /* 
@@ -23,6 +23,17 @@ void safe_write(int fd, const void *buf, int count){
     perror("write:");
     exit(-1);
   }
+}
+
+int safe_read(int fd, void *buf, int count){
+  int ret = read(fd, buf, count);
+  if(ret == -1){
+    perror("read:");
+    exit(-1);
+  }
+  //printf("read %d bytes \n", ret);
+  printf("%s",(char *)buf);
+  return ret;
 }
 
 /* 
@@ -239,6 +250,8 @@ int main(int argc, char* argv[]) {
             // information.
             if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
                 perror("accept");
+                close(fd);
+                exit(1);
             } 
             else {        
               add_fd(fd, &head);//add it to the map structure
@@ -249,15 +262,15 @@ int main(int argc, char* argv[]) {
         List *cur = head;
         while (cur != NULL && cur->fd > 0){
             if (FD_ISSET(cur->fd, &set) && cur->fd != listenfd) {
-                nbytes = read(cur->fd, cur->buf, cur->room) ;
-                //printf("read %d bytes :%s\n",nbytes, cur->buf);
+                nbytes = safe_read(cur->fd, cur->buf, cur->room) ;
+                //printf("read %d bytes :%s\n room: %d",nbytes, cur->buf,cur->room);
                 if (nbytes < 0) {
                     perror("read");
                 } 
                 else if (nbytes == 0) {
                     //if read returns 0, we know that users is disconnected
                     invalid(cur->fd,head);
-                    printf("user is closed\n");
+                    printf("bye\n");
                     close(fd);
                 }
                 else {
@@ -268,11 +281,13 @@ int main(int argc, char* argv[]) {
                     cur->where = find_network_newline(cur->buf, cur->inbuf);
             
                     if (cur->where >= 0) { // OK. we have a full line
-                        cur->buf[cur->where] = '\n';
+                        cur->buf[cur->where] = '\0';
                         cur->buf[cur->where+1] = '\0';
+                        char *tmp = malloc(strlen(cur->buf) + 1);
+                        strncpy(tmp, cur->buf, strlen(cur->buf) + 1);
                         char *cmd_argv[INPUT_ARG_MAX_NUM];
                         //printf("buf %s\n",cur->buf );
-                        int cmd_argc = tokenize(cur->buf, cmd_argv);
+                        int cmd_argc = tokenize(tmp, cmd_argv);
                         //printf("%d\n", cmd_argc);
                         if(cur->inited == 0){
                             //haven't created yet
@@ -288,14 +303,15 @@ int main(int argc, char* argv[]) {
                             }
                             switch (create_user(name, &user_list)) {
                                 case 1:
-                                    response = "Welcome back.\r\nGo ahead and enter user commands>\r\n" ;
+                                    response = "Welcome back.Go ahead and enter user commands\r\n" ;
                                     safe_write(cur->fd, response, strlen(response) + 1);
+                                    safe_write(cur->fd, "> ", strlen("> ") + 1);
                                     break;
                                 case 2:
                                     //should never happen since we already handle the string length
                                     break;
                                 case 0:
-                                    response = "Welcome.\r\nGo ahead and enter user commands>\r\n" ;
+                                    response = "Welcome.Go ahead and enter user commands\r\n" ;
                                     safe_write(cur->fd, response, strlen(response) + 1);
                                     safe_write(cur->fd, "> ", strlen("> ") + 1);
                                     break;
@@ -303,6 +319,7 @@ int main(int argc, char* argv[]) {
 
                         }
                         else{
+                            //printf("read %d bytes :%s\n",nbytes, cmd_argv[0]);
                             if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd) == -1) {
                                 invalid(cur->fd,head);
                                 printf("bye\n");

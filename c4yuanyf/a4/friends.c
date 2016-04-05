@@ -68,6 +68,7 @@ void add_fd(int fd, List** head){
         (*head)->inbuf = 0;
         (*head)->room = sizeof((*head)->buf);
         (*head)->after = (*head)->buf;
+        memset((*head)->buf, '\0', 100);
         return;
     }else{
         // if there is invalid node (user connect and then disconnect), we can 
@@ -78,6 +79,7 @@ void add_fd(int fd, List** head){
             node->inbuf = 0;
             node->room = sizeof((*head)->buf);
             node->after = (*head)->buf;
+            memset(node->buf, '\0', 100);
             return;
         }else{
             List *cur = *head;
@@ -89,6 +91,7 @@ void add_fd(int fd, List** head){
             (cur->next)->inbuf = 0;
             (cur->next)->room = sizeof(cur->next->buf);
             (cur->next)->after = (cur->next)->buf;
+            memset(cur->next->buf, '\0', 100);
             return;
         }
 
