@@ -87,8 +87,8 @@ void add_fd(int fd, List** head){
             cur->next = malloc(sizeof(List));
             (cur->next)->fd = fd;
             (cur->next)->inbuf = 0;
-            (cur->next)->room = sizeof((*head)->buf);
-            (cur->next)->after = (*head)->buf;
+            (cur->next)->room = sizeof(cur->next->buf);
+            (cur->next)->after = (cur->next)->buf;
             return;
         }
 
@@ -144,6 +144,7 @@ void invalid(int fd, List *head){
     p->room = sizeof((p)->buf);
     p->after = p->buf;
     p->inited = 0;
+    p->where = 0;
     free(p->name);
 }
 
