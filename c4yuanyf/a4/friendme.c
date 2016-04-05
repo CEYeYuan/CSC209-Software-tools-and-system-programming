@@ -249,7 +249,9 @@ int main(int argc, char* argv[]) {
         List *cur = head;
         while (cur != NULL && cur->fd > 0){
             if (FD_ISSET(cur->fd, &set) && cur->fd != listenfd) {
-                if ((nbytes = read(cur->fd, cur->buf, cur->room)) < 0) {
+                nbytes = read(cur->fd, cur->buf, cur->room) ;
+                //printf("read %d bytes :%s\n",nbytes, cur->buf);
+                if (nbytes < 0) {
                     perror("read");
                 } 
                 else if (nbytes == 0) {
@@ -269,25 +271,28 @@ int main(int argc, char* argv[]) {
                         cur->buf[cur->where] = '\n';
                         cur->buf[cur->where+1] = '\0';
                         char *cmd_argv[INPUT_ARG_MAX_NUM];
-                        printf("buf %s\n",cur->buf );
+                        //printf("buf %s\n",cur->buf );
                         int cmd_argc = tokenize(cur->buf, cmd_argv);
-                        printf("%d\n", cmd_argc);
+                        //printf("%d\n", cmd_argc);
                         if(cur->inited == 0){
                             //haven't created yet
                             strncpy(name, cmd_argv[0], 31);
                             name[31] = '\0';
                             set_name(cur->fd, head, name);
                             char *response = NULL;
+                            if(nbytes >= 31+2){
+                                //31 for the characters, 2 for the network newline
+                                response = "Username too long, truncated to 31 chars.\r\n" ;
+                                safe_write(cur->fd, response, strlen(response) + 1);
+                                safe_write(cur->fd, "> ", strlen("> ") + 1); 
+                            }
                             switch (create_user(name, &user_list)) {
                                 case 1:
                                     response = "Welcome back.\r\nGo ahead and enter user commands>\r\n" ;
                                     safe_write(cur->fd, response, strlen(response) + 1);
-                                    safe_write(cur->fd, "> ", strlen("> ") + 1);
                                     break;
                                 case 2:
-                                    response = "Username too long, truncated to 31 chars.\r\nGo ahead and enter user commands>\r\n" ;
-                                    safe_write(cur->fd, response, strlen(response) + 1);
-                                    safe_write(cur->fd, "> ", strlen("> ") + 1);
+                                    //should never happen since we already handle the string length
                                     break;
                                 case 0:
                                     response = "Welcome.\r\nGo ahead and enter user commands>\r\n" ;
