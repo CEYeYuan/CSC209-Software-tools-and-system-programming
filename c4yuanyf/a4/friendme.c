@@ -31,6 +31,7 @@ int safe_read(int fd, void *buf, int count){
     perror("read:");
     exit(-1);
   }
+  printf("buffer: %s\n", (char *)buf);
   return ret;
 }
 
@@ -182,7 +183,7 @@ int setup(void) {
     exit(1);
   }
 
-  if (listen(listenfd, 5) == -1) {
+  if (listen(listenfd, 20) == -1) {
     perror("listen");
     exit(1);
   }
