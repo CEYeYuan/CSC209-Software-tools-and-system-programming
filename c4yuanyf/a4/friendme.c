@@ -31,8 +31,6 @@ int safe_read(int fd, void *buf, int count){
     perror("read:");
     exit(-1);
   }
-  //printf("read %d bytes \n", ret);
-  printf("%s",(char *)buf);
   return ret;
 }
 
@@ -228,11 +226,8 @@ int main(int argc, char* argv[]) {
     listenfd = setup();
     add_fd(listenfd, &head);
     while (1) {
-      /* CONNECTION SETUP
-        
-      */
-        fd_set set;
 
+        fd_set set;
         build_fdset(&set, head);
         int numfd = find_max_fd(head) + 1;
          //select always remove fd from the set, never add more in
@@ -262,8 +257,7 @@ int main(int argc, char* argv[]) {
         List *cur = head;
         while (cur != NULL && cur->fd > 0){
             if (FD_ISSET(cur->fd, &set) && cur->fd != listenfd) {
-                nbytes = safe_read(cur->fd, cur->buf, cur->room) ;
-                //printf("read %d bytes :%s\n room: %d",nbytes, cur->buf,cur->room);
+                nbytes = safe_read(cur->fd, cur->after, cur->room) ;
                 if (nbytes < 0) {
                     perror("read");
                 } 
@@ -286,9 +280,7 @@ int main(int argc, char* argv[]) {
                         char *tmp = malloc(strlen(cur->buf) + 1);
                         strncpy(tmp, cur->buf, strlen(cur->buf) + 1);
                         char *cmd_argv[INPUT_ARG_MAX_NUM];
-                        //printf("buf %s\n",cur->buf );
                         int cmd_argc = tokenize(tmp, cmd_argv);
-                        //printf("%d\n", cmd_argc);
                         if(cur->inited == 0){
                             //haven't created yet
                             strncpy(name, cmd_argv[0], 31);
