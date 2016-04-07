@@ -45,6 +45,11 @@ typedef struct list{
 List* find_by_fd(int fd, List* head);
 
 /*
+*   given a name, return the corresponding user node
+*/
+List* find_by_name(char *name, List* head);
+
+/*
 *  when there is new user connected in, we want to added it into the fd-name list 
 */
 void add_fd(int fd, List** head);
@@ -62,6 +67,11 @@ void build_fdset(fd_set *set,  List* head);
 /*
 * after a user disconnected, since that fd may be used for newly connected user,
 * the bind between the fd and old user should be removed
+* There are two cases:
+* 1.if the user is not initialized yet, even before the name and fd is bind, we can
+* simply invalid all it's data
+* 2. if the user is initialzied already, we just invalid that fd. When next time the 
+* user is logged back in, we can reuse these info
 */
 void invalid(int fd,  List* head);
 
@@ -71,15 +81,10 @@ void invalid(int fd,  List* head);
 int find_max_fd(List* head);
 
 /*
- * Create a new user with the given name.  Insert it at the tail of the list
- * of users whose head is pointed to by *user_ptr_add.
- *
- * Return:
- *   - 0 if successful
- *   - 1 if a user by this name already exists in this list
- *   - 2 if the given name cannot fit in the 'name' array
- *       (don't forget about the null terminator)
- */
+* after a user disconnected, since that fd may be used for newly connected user,
+* the bind between the fd and old user should be removed
+* when we invalid a fd, we just find that node, and set it's value to -1
+*/
 int create_user(const char *name, User **user_ptr_add);
 
 

@@ -100,6 +100,20 @@ void add_fd(int fd, List** head){
     }
 }
 
+
+/*
+*   given a name, return the corresponding user node
+*/
+List* find_by_name(char *name, List* head){
+    while (head != NULL) {
+        if(head->name == NULL || strcmp(head->name, name) != 0)
+            head = head->next;
+        else
+            return head;
+
+    }
+    return NULL;
+}
 /*
 *   given an fd, return the corresponding user  
 */
@@ -150,7 +164,8 @@ void invalid(int fd, List *head){
     p->inited = 0;
     p->where = 0;
     p->next = NULL;
-    free(p->name);
+    if(p->name != NULL)
+        free(p->name);
 }
 
 /*

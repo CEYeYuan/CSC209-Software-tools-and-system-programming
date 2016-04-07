@@ -39,7 +39,7 @@ int safe_read(int fd, void *buf, int count){
  * Return:  -1 for quit command
  *          0 otherwise
  */
-int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name, int fd) {
+int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name, int fd, List* head) {
     User *user_list = *user_list_ptr;
     char *response = NULL;
     int len = 0;
@@ -61,6 +61,14 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
                  response = malloc(sizeof(char) * len);
                  snprintf(response, len, "You are now friends with %s\r\n", cmd_argv[1]);
                  safe_write(fd, response, strlen(response)+1);
+                 free(response);
+
+                 len = strlen("You are now friends with ") + strlen(name) + 3;
+                 response = malloc(sizeof(char) * len);
+                 snprintf(response, len, "You are now friends with %s\r\n", name);
+                 List* node = find_by_name(cmd_argv[1], head);
+                 if(node != NULL && node->fd != -1)//we only send the msg when that user is online
+                    safe_write(node->fd, response, strlen(response)+1);
                  free(response);
                  break;
             case 1:
@@ -104,6 +112,16 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
         User *author = find_user(name, user_list);
         User *target = find_user(cmd_argv[1], user_list);
         switch (make_post(author, target, contents)) {
+            case 0:
+                //on sucess
+                 len = strlen("From ") + strlen(name) + strlen(": ") + strlen(contents) + 3;
+                 response = malloc(sizeof(char) * len);
+                 snprintf(response, len, "From %s: %s\r\n", name, contents);
+                 List* node = find_by_name(cmd_argv[1], head);
+                 if(node != NULL && node->fd != -1)//we only send the msg when that user is online
+                    safe_write(node->fd, response, strlen(response)+1);
+                 free(response);
+                 break;
             case 1:
                 response = "You can only post to your friends\r\n";
                 safe_write(fd, response, strlen(response)+1);
@@ -311,7 +329,7 @@ int main(int argc, char* argv[]) {
                         }
                         else{
                             //printf("read %d bytes :%s\n",nbytes, cmd_argv[0]);
-                            if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd) == -1) {
+                            if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd, head) == -1) {
                                 invalid(cur->fd,head);
                                 safe_write(cur->fd, "bye\r\n", strlen("bye\r\n") + 1);
                                 close(fd); // can only reach if quit command was entered
