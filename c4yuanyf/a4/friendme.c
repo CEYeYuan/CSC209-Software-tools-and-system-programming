@@ -253,7 +253,8 @@ int main(int argc, char* argv[]) {
             } 
             else { 
               add_fd(fd, &head);
-              printf("fd = %d\n",fd );       
+              FD_SET(fd, &set);
+              //printf("fd = %d\n",fd );       
               safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
             }
         }
@@ -268,6 +269,7 @@ int main(int argc, char* argv[]) {
                 else if (nbytes == 0) {
                     //if read returns 0, we know that users is disconnected
                     invalid(cur->fd,head);
+                    FD_CLR(cur->fd, &set);
                     close(fd);
                 }
                 else {
@@ -324,6 +326,7 @@ int main(int argc, char* argv[]) {
                             //printf("read %d bytes :%s\n",nbytes, cmd_argv[0]);
                             if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd, head) == -1) {
                                 invalid(cur->fd,head);
+                                FD_CLR(cur->fd, &set);
                                 close(fd); // can only reach if quit command was entered
                             }else{
                                 safe_write(cur->fd, "> ", strlen("> ") + 1);
