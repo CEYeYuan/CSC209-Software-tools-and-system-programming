@@ -174,7 +174,6 @@ void set_name(List *node, char *name){
 *   given an user list, build the corresponding fdset
 */
 void build_fdset(fd_set *set,  List* head){
-     FD_ZERO(set);
       while (head != NULL) {
         if(head->fd > 0)
             FD_SET(head->fd, set);
@@ -192,6 +191,8 @@ void invalid(int fd, List *head){
     // since we only call unset on quit function, at that time, there must be one 
     //user using that fd
     assert(p != NULL);
+    if(p->inited == 1 && p->name != NULL)
+        free(p->name);
     p->fd = -1;
     p->inbuf = 0;
     p->room = sizeof((p)->buf);
@@ -199,8 +200,7 @@ void invalid(int fd, List *head){
     p->inited = 0;
     p->where = 0;
     p->next = NULL;
-    if(p->name != NULL)
-        free(p->name);
+   
 }
 
 /*

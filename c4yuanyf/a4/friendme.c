@@ -226,10 +226,12 @@ int main(int argc, char* argv[]) {
     socklen_t socklen;
     List *head = NULL;// the list-map for the fd and name
     listenfd = setup();
+    add_fd(listenfd, &head);
     while (1) {
 
         fd_set set;
-        add_fd(listenfd, &head);
+        FD_ZERO(&set);
+        FD_SET(listenfd, &set);
         build_fdset(&set, head);
         int numfd = find_max_fd(head) + 1;
          //select always remove fd from the set, never add more in
@@ -247,11 +249,11 @@ int main(int argc, char* argv[]) {
             // information.
             if ((fd = accept(listenfd, (struct sockaddr *)&peer, &socklen)) < 0) {
                 perror("accept");
-                close(fd);
                 exit(1);
             } 
             else { 
-              add_fd(fd, &head);       
+              add_fd(fd, &head);
+              printf("fd = %d\n",fd );       
               safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
             }
         }
@@ -275,7 +277,7 @@ int main(int argc, char* argv[]) {
                     // Step 3: call find_network_newline, store result in variable "where"
                     cur->where = find_network_newline(cur->buf, cur->inbuf);
             
-                    if (cur->where >= 0) { // OK. we have a full line
+                    if (cur->where >= 0) { // OK. we have a full liadd_ne
                         cur->buf[cur->where] = '\0';
                         cur->buf[cur->where+1] = '\0';
                         char *tmp = malloc(strlen(cur->buf) + 1);
