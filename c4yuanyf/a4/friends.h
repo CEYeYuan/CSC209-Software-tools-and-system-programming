@@ -52,7 +52,7 @@ void add_fd(int fd, List** head);
 /*
 *   given an fd, set the name in that node
 */
-void set_name(int fd, List *head, char* name);
+void set_name(List *node, char* name);
 
 /*
 *   given an user list, build the corresponding fdset

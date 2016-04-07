@@ -31,7 +31,6 @@ int safe_read(int fd, void *buf, int count){
     perror("read:");
     exit(-1);
   }
-  printf("buffer: %s\n", (char *)buf);
   return ret;
 }
 
@@ -73,8 +72,8 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
                 safe_write(fd, response, strlen(response)+1);
                 break;
             case 3:
-                //should never happen
-                //error("you must enter two different users");
+                response = "You can not friend yourself\r\n";
+                safe_write(fd, response, strlen(response)+1);
                 break;
             case 4:
                 response = "the user you entered does not exist\r\n";
@@ -225,10 +224,10 @@ int main(int argc, char* argv[]) {
     socklen_t socklen;
     List *head = NULL;// the list-map for the fd and name
     listenfd = setup();
-    add_fd(listenfd, &head);
     while (1) {
 
         fd_set set;
+        add_fd(listenfd, &head);
         build_fdset(&set, head);
         int numfd = find_max_fd(head) + 1;
          //select always remove fd from the set, never add more in
@@ -249,8 +248,8 @@ int main(int argc, char* argv[]) {
                 close(fd);
                 exit(1);
             } 
-            else {        
-              add_fd(fd, &head);//add it to the map structure
+            else { 
+              add_fd(fd, &head);       
               safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
             }
         }
@@ -265,7 +264,6 @@ int main(int argc, char* argv[]) {
                 else if (nbytes == 0) {
                     //if read returns 0, we know that users is disconnected
                     invalid(cur->fd,head);
-                    printf("bye\n");
                     close(fd);
                 }
                 else {
@@ -286,7 +284,8 @@ int main(int argc, char* argv[]) {
                             //haven't created yet
                             strncpy(name, cmd_argv[0], 31);
                             name[31] = '\0';
-                            set_name(cur->fd, head, name);
+                            set_name(cur, name);
+                            cur->inited = 1;
                             char *response = NULL;
                             if(nbytes >= 31+2){
                                 //31 for the characters, 2 for the network newline
@@ -309,26 +308,23 @@ int main(int argc, char* argv[]) {
                                     safe_write(cur->fd, "> ", strlen("> ") + 1);
                                     break;
                             }
-
                         }
                         else{
                             //printf("read %d bytes :%s\n",nbytes, cmd_argv[0]);
                             if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd) == -1) {
                                 invalid(cur->fd,head);
-                                printf("bye\n");
+                                safe_write(cur->fd, "bye\r\n", strlen("bye\r\n") + 1);
                                 close(fd); // can only reach if quit command was entered
-                            }
-                            safe_write(cur->fd, "> ", strlen("> ") + 1);
+                            }else{
+                                safe_write(cur->fd, "> ", strlen("> ") + 1);
+                            }    
                         }
-                     
-                        // Step 5: update inbuf and remove the full line from the buffer
-                        cur->inbuf -= cur->where+2;
-                        cur->buf[cur->where] = '\0';
-                        
-                        // You want to move the stuff after the full line to the beginning 
-                        // of the buffer.  
-                        memmove(cur->buf, (cur->buf)+cur->where+2, cur->inbuf);
-                    
+                            // Step 5: update inbuf and remove the full line from the buffer
+                            cur->inbuf -= cur->where+2;
+                            cur->buf[cur->where] = '\0'; 
+                            // You want to move the stuff after the full line to the beginning 
+                            // of the buffer.  
+                            memmove(cur->buf, (cur->buf)+cur->where+2, cur->inbuf);
                     }
                     // Step 6: update room and after, in preparation for the next read
                     cur->room = sizeof(cur->buf) - cur->inbuf;

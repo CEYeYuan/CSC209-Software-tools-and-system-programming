@@ -68,6 +68,7 @@ void add_fd(int fd, List** head){
         (*head)->inbuf = 0;
         (*head)->room = sizeof((*head)->buf);
         (*head)->after = (*head)->buf;
+        (*head)->next = NULL;
         memset((*head)->buf, '\0', 100);
         return;
     }else{
@@ -91,6 +92,7 @@ void add_fd(int fd, List** head){
             (cur->next)->inbuf = 0;
             (cur->next)->room = sizeof(cur->next->buf);
             (cur->next)->after = (cur->next)->buf;
+            (cur->next)->next = NULL;
             memset(cur->next->buf, '\0', 100);
             return;
         }
@@ -111,13 +113,11 @@ List* find_by_fd(int fd,  List* head){
 /*
 *   given an fd, set the name in that node
 */
-void set_name(int fd, List *head, char *name){
-    List *node = find_by_fd(fd, head);
+void set_name(List *node, char *name){
     assert(node != NULL);
     assert(node->inited == 0);
-    node->inited = 1;
     node->name = malloc(sizeof(char) * (strlen(name) + 1));
-    strcpy(node->name, name);
+    strncpy(node->name, name,strlen(name) + 1);
     return;
 }
 
@@ -126,9 +126,10 @@ void set_name(int fd, List *head, char *name){
 */
 void build_fdset(fd_set *set,  List* head){
      FD_ZERO(set);
-      while (head != NULL && head->fd > 0) {
-         FD_SET(head->fd, set);
-         head = head->next;
+      while (head != NULL) {
+        if(head->fd > 0)
+            FD_SET(head->fd, set);
+        head = head->next;
       }
 }
 
@@ -148,6 +149,7 @@ void invalid(int fd, List *head){
     p->after = p->buf;
     p->inited = 0;
     p->where = 0;
+    p->next = NULL;
     free(p->name);
 }
 
