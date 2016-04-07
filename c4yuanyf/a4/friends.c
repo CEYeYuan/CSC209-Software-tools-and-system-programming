@@ -56,6 +56,38 @@ int create_user(const char *name, User **user_ptr_add) {
     }
 }
 
+void safe_write(int fd, const void *buf, int count){
+  int ret = write(fd, buf, count);
+  if(ret == -1){
+    perror("write:");
+    exit(-1);
+  }
+}
+
+int safe_read(int fd, void *buf, int count){
+  int ret = read(fd, buf, count);
+  if(ret == -1){
+    perror("read:");
+    exit(-1);
+  }
+  return ret;
+}
+
+
+/*
+* given a message, the name of the client, and the head of the active
+* client list, notify all of them with the msg
+*/
+void notify(char *msg, char *name, List *head, int len){
+     while (head != NULL) {
+        if(head->name == NULL || strcmp(head->name, name) != 0)
+            ;
+        else
+            safe_write(head->fd, msg,len);
+        head = head->next;
+    }
+}
+
 /*
 *  when there is new user connected in, we want to added it into the fd-name list 
 */
@@ -65,6 +97,7 @@ void add_fd(int fd, List** head){
         //the list has not been initialized
         *head = malloc(sizeof(List));
         (*head)->fd = fd;
+        (*head)->inited = fd;
         (*head)->inbuf = 0;
         (*head)->room = sizeof((*head)->buf);
         (*head)->after = (*head)->buf;
@@ -77,6 +110,7 @@ void add_fd(int fd, List** head){
         List *node = find_by_fd(-1, *head);
         if(node != NULL){
             node->fd = fd;
+            node->inited = 0;
             node->inbuf = 0;
             node->room = sizeof((*head)->buf);
             node->after = (*head)->buf;
@@ -90,6 +124,7 @@ void add_fd(int fd, List** head){
             cur->next = malloc(sizeof(List));
             (cur->next)->fd = fd;
             (cur->next)->inbuf = 0;
+            (cur->next)->inited = 0;
             (cur->next)->room = sizeof(cur->next->buf);
             (cur->next)->after = (cur->next)->buf;
             (cur->next)->next = NULL;

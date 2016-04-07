@@ -39,6 +39,18 @@ typedef struct list{
     int where; // location of network newline
 } List;
 
+
+/*
+* wrapper function of read/write system call
+*/
+int safe_read(int fd, void *buf, int count);
+void safe_write(int fd, const void *buf, int count);
+
+/*
+* given a message, the name of the client, and the head of the active
+* client list, notify all of them with the msg
+*/
+void notify(char *msg, char *name, List *head, int len);
 /*
 *   given an fd, return the corresponding user name 
 */

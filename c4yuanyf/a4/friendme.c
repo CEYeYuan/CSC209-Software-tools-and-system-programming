@@ -17,22 +17,6 @@ void error(char *msg) {
     fprintf(stderr, "Error: %s\n", msg);
 }
 
-void safe_write(int fd, const void *buf, int count){
-  int ret = write(fd, buf, count);
-  if(ret == -1){
-    perror("write:");
-    exit(-1);
-  }
-}
-
-int safe_read(int fd, void *buf, int count){
-  int ret = read(fd, buf, count);
-  if(ret == -1){
-    perror("read:");
-    exit(-1);
-  }
-  return ret;
-}
 
 /* 
  * Read and process commands
@@ -66,9 +50,7 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
                  len = strlen("You are now friends with ") + strlen(name) + 3;
                  response = malloc(sizeof(char) * len);
                  snprintf(response, len, "You are now friends with %s\r\n", name);
-                 List* node = find_by_name(cmd_argv[1], head);
-                 if(node != NULL && node->fd != -1)//we only send the msg when that user is online
-                    safe_write(node->fd, response, strlen(response)+1);
+                 notify(response, cmd_argv[1], head, len);
                  free(response);
                  break;
             case 1:
@@ -117,9 +99,11 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
                  len = strlen("From ") + strlen(name) + strlen(": ") + strlen(contents) + 3;
                  response = malloc(sizeof(char) * len);
                  snprintf(response, len, "From %s: %s\r\n", name, contents);
+                 notify(response, cmd_argv[1], head, len);
+                 /*
                  List* node = find_by_name(cmd_argv[1], head);
                  if(node != NULL && node->fd != -1)//we only send the msg when that user is online
-                    safe_write(node->fd, response, strlen(response)+1);
+                    safe_write(node->fd, response, strlen(response)+1);*/
                  free(response);
                  break;
             case 1:
@@ -326,23 +310,30 @@ int main(int argc, char* argv[]) {
                                     safe_write(cur->fd, "> ", strlen("> ") + 1);
                                     break;
                             }
-                        }
-                        else{
-                            //printf("read %d bytes :%s\n",nbytes, cmd_argv[0]);
-                            if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd, head) == -1) {
-                                invalid(cur->fd,head);
-                                safe_write(cur->fd, "bye\r\n", strlen("bye\r\n") + 1);
-                                close(fd); // can only reach if quit command was entered
-                            }else{
-                                safe_write(cur->fd, "> ", strlen("> ") + 1);
-                            }    
-                        }
+
                             // Step 5: update inbuf and remove the full line from the buffer
                             cur->inbuf -= cur->where+2;
                             cur->buf[cur->where] = '\0'; 
                             // You want to move the stuff after the full line to the beginning 
                             // of the buffer.  
                             memmove(cur->buf, (cur->buf)+cur->where+2, cur->inbuf);
+                        }
+                        else{
+                            //printf("read %d bytes :%s\n",nbytes, cmd_argv[0]);
+                            if (cmd_argc > 0 && process_args(cmd_argc, cmd_argv, &user_list, cur->name, cur->fd, head) == -1) {
+                                invalid(cur->fd,head);
+                                close(fd); // can only reach if quit command was entered
+                            }else{
+                                safe_write(cur->fd, "> ", strlen("> ") + 1);
+
+                                // Step 5: update inbuf and remove the full line from the buffer
+                                cur->inbuf -= cur->where+2;
+                                cur->buf[cur->where] = '\0'; 
+                                // You want to move the stuff after the full line to the beginning 
+                                // of the buffer.  
+                                memmove(cur->buf, (cur->buf)+cur->where+2, cur->inbuf);
+                            }    
+                        }
                     }
                     // Step 6: update room and after, in preparation for the next read
                     cur->room = sizeof(cur->buf) - cur->inbuf;
