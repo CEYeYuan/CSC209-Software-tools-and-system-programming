@@ -253,7 +253,7 @@ int main(int argc, char* argv[]) {
             } 
             else { 
               add_fd(fd, &head);
-              FD_SET(fd, &set);
+              //FD_SET(fd, &set);
               //printf("fd = %d\n",fd );       
               safe_write(fd, "What is your user name?\n", strlen("What is your user name?\n") +1);
             }
@@ -278,7 +278,6 @@ int main(int argc, char* argv[]) {
                     cur->inbuf += nbytes;
                     // Step 3: call find_network_newline, store result in variable "where"
                     cur->where = find_network_newline(cur->buf, cur->inbuf);
-            
                     if (cur->where >= 0) { // OK. we have a full liadd_ne
                         cur->buf[cur->where] = '\0';
                         cur->buf[cur->where+1] = '\0';

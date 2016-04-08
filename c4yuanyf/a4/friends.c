@@ -82,8 +82,12 @@ void notify(char *msg, char *name, List *head, int len){
      while (head != NULL) {
         if(head->name == NULL || strcmp(head->name, name) != 0)
             ;
-        else
-            safe_write(head->fd, msg,len);
+        else{
+             safe_write(head->fd, msg,len);
+             safe_write(head->fd, "> ", strlen("> ") + 1);
+
+        }
+           
         head = head->next;
     }
 }
@@ -113,7 +117,7 @@ void add_fd(int fd, List** head){
             node->inited = 0;
             node->inbuf = 0;
             node->room = sizeof((*head)->buf);
-            node->after = (*head)->buf;
+            node->after = (node)->buf;
             memset(node->buf, '\0', 100);
             return;
         }else{
@@ -193,6 +197,7 @@ void invalid(int fd, List *head){
     assert(p != NULL);
     if(p->inited == 1 && p->name != NULL)
         free(p->name);
+    memset(p->buf,'\0',100); 
     p->fd = -1;
     p->inbuf = 0;
     p->room = sizeof((p)->buf);
