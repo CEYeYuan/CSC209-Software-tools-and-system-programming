@@ -1,5 +1,5 @@
 #ifndef PORT
-	#define PORT 54247
+    #define PORT 54247
 #endif
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -62,7 +62,7 @@ List* find_by_fd(int fd, List* head);
 List* find_by_name(char *name, List* head);
 
 /*
-*  when there is new user connected in, we want to added it into the fd-name list 
+*  when there is new user connected in, we want to added it into fd-name list
 */
 void add_fd(int fd, List** head);
 
@@ -80,10 +80,10 @@ void build_fdset(fd_set *set,  List* head);
 * after a user disconnected, since that fd may be used for newly connected user,
 * the bind between the fd and old user should be removed
 * There are two cases:
-* 1.if the user is not initialized yet, even before the name and fd is bind, we can
-* simply invalid all it's data
-* 2. if the user is initialzied already, we just invalid that fd. When next time the 
-* user is logged back in, we can reuse these info
+* 1.if the user is not initialized yet, even before the name and fd is bind, 
+* we can simply invalid all it's data
+* 2. if the user is initialzied already, we just invalid that fd. 
+* When next time the user is logged back in, we can reuse these info
 */
 void invalid(int fd,  List* head);
 
@@ -166,5 +166,4 @@ char* print_user(const User *user);
  *   - 2 if either User pointer is NULL
  */
 int make_post(const User *author, User *target, char *contents);
-
 
