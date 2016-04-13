@@ -86,7 +86,7 @@ int process_args(int cmd_argc, char **cmd_argv, User **user_list_ptr, char *name
 
         // copy in the bits to make a single string
         strcpy(contents, cmd_argv[2]);
-        for (int i = 4; i < cmd_argc; i++) {
+        for (int i = 3; i < cmd_argc; i++) {
             strcat(contents, " ");
             strcat(contents, cmd_argv[i]);
         }

@@ -6,10 +6,10 @@ hash ban (shban in the first line)
 #!/bin/sh
 variable names : CAPS
 dereference : use $     $NAME
-NAME=YE			#name space around '='
+NAME=YE			#no space around '='
 ~ or $HOME	: home directory
 $NAME will try to interpret NAME as a program:
-	$NAME=date
+	NAME=date
 	$name   will run date 
 
 for file in 1 2 3 			#file is a variable
